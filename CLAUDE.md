@@ -41,6 +41,14 @@ icons, working menu bar, and a playable Solitaire app.
 
 ## index.html architecture
 
+- **Boot sequence**: `#boot` overlay (z 10000, desktop gray) plays on every load — ~0.9s
+  Happy Mac (`#icon-happymac`, 32×32 symbol) → "Welcome to Macintosh." box (double black
+  pinstripe frame) with status text + chunky stepped progress bar (`#0000AA` fill, no easing)
+  while 7 "extension" icons march in bottom-left (reuses existing symbols). Any mousedown or
+  keydown skips. Skipped entirely (overlay removed immediately) under `prefers-reduced-motion`
+  or <768px. The wallpaper `life.set(...)` call lives inside the boot module's
+  `startWallpaper()` — it only runs when boot ends, so glider guns fire from a fresh desktop.
+  Special→Restart reloads the page, which replays the boot (intentional).
 - **Window system**: windows registered in `wins` (id → `{el, icon}`) from the array
   `['about','projects','resume','contact','solitaire']`; element ids are `win-<id>` and
   `dicon-<id>`. Default positions via `data-x`/`data-y`. Key functions: `openWin`, `closeWin`,

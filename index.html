@@ -312,6 +312,30 @@ body.life-edit #life-palette{display:block;}
 #solitaire-frame{display:block;width:100%;height:100%;border:none;background:#FFFFFF;}
 body.win-dragging iframe{pointer-events:none;}
 
+/* ---------------- Boot sequence ---------------- */
+#boot{
+  position:fixed;inset:0;background:var(--desktop);z-index:10000;
+  display:flex;align-items:center;justify-content:center;
+  cursor:default;user-select:none;-webkit-user-select:none;
+}
+#boot-mac svg{width:64px;height:64px;display:block;}
+#boot-box{display:none;background:#FFFFFF;border:2px solid #000000;padding:3px;}
+#boot.welcome #boot-mac{display:none;}
+#boot.welcome #boot-box{display:block;}
+.boot-inner{border:1px solid #000000;padding:22px 38px 18px;text-align:center;}
+#boot-title{font-family:var(--font-chrome);font-size:16px;white-space:nowrap;}
+#boot-status{
+  font-family:var(--font-body);font-size:11px;
+  margin-top:16px;min-height:13px;line-height:13px;
+}
+#boot-bar{
+  width:224px;height:12px;margin:6px auto 0;
+  border:1px solid #000000;background:#FFFFFF;
+}
+#boot-fill{height:100%;width:0;background:#0000AA;}
+#boot-exts{position:absolute;left:14px;bottom:12px;display:flex;gap:12px;}
+#boot-exts svg{width:32px;height:32px;display:block;}
+
 /* ---------------- Zoom rect ---------------- */
 .zoomrect{
   position:fixed;border:1px dashed #000000;background:transparent;
@@ -327,6 +351,7 @@ body.win-dragging iframe{pointer-events:none;}
 
 /* ---------------- Mobile ---------------- */
 @media (max-width:767px){
+  #boot{display:none !important;}
   #icons{display:none;}
   .window{display:none !important;}
   #win-about{
@@ -495,6 +520,25 @@ body.win-dragging iframe{pointer-events:none;}
       <rect x="5" y="14" width="6" height="1" fill="#888888"/>
     </symbol>
 
+    <symbol id="icon-happymac" viewBox="0 0 32 32">
+      <rect x="6" y="2" width="20" height="24" fill="#000000"/>
+      <rect x="7" y="3" width="18" height="22" fill="#FFFFFF"/>
+      <rect x="9" y="5" width="14" height="11" fill="#000000"/>
+      <rect x="10" y="6" width="12" height="9" fill="#FFFFFF"/>
+      <g fill="#000000">
+        <rect x="13" y="7" width="1" height="2"/>
+        <rect x="18" y="7" width="1" height="2"/>
+        <rect x="15" y="8" width="1" height="2"/>
+        <rect x="12" y="11" width="1" height="1"/>
+        <rect x="13" y="12" width="6" height="1"/>
+        <rect x="19" y="11" width="1" height="1"/>
+      </g>
+      <rect x="14" y="18" width="8" height="1" fill="#000000"/>
+      <rect x="9" y="22" width="14" height="1" fill="#888888"/>
+      <rect x="9" y="26" width="14" height="3" fill="#000000"/>
+      <rect x="10" y="27" width="12" height="1" fill="#888888"/>
+    </symbol>
+
     <symbol id="icon-cards" viewBox="0 0 32 32">
       <rect x="5" y="3" width="16" height="22" fill="#000000"/>
       <rect x="6" y="4" width="14" height="20" fill="#FFFFFF"/>
@@ -533,6 +577,20 @@ body.win-dragging iframe{pointer-events:none;}
     </symbol>
   </defs>
 </svg>
+
+<!-- ================= BOOT SEQUENCE ================= -->
+<!-- Covers everything (z 10000) until startup finishes; click or any key skips. -->
+<div id="boot">
+  <div id="boot-mac"><svg viewBox="0 0 32 32"><use href="#icon-happymac"/></svg></div>
+  <div id="boot-box">
+    <div class="boot-inner">
+      <div id="boot-title">Welcome to Macintosh.</div>
+      <div id="boot-status">&nbsp;</div>
+      <div id="boot-bar"><div id="boot-fill"></div></div>
+    </div>
+  </div>
+  <div id="boot-exts"></div>
+</div>
 
 <!-- ================= MENU BAR ================= -->
 <div id="menubar">
@@ -1536,7 +1594,64 @@ zTop += 1; wins.about.el.style.zIndex = zTop;
 setActive('about');
 wins.about.icon.classList.add('selected');
 wins.projects.icon.classList.add('selected');
-life.set((reduced || window.innerWidth < 768) ? 'blank' : 'gun');
+
+/* ---------- Mac OS boot sequence ---------- */
+/* Gray power-on screen with the Happy Mac, then "Welcome to Macintosh." with
+   extensions marching in bottom-left. The wallpaper only starts once the boot
+   overlay drops, so the glider guns fire from a fresh desktop. */
+(function(){
+  var bootEl = document.getElementById('boot');
+  function startWallpaper(){
+    life.set((reduced || window.innerWidth < 768) ? 'blank' : 'gun');
+  }
+  if (reduced || window.innerWidth < 768){
+    bootEl.remove();
+    startWallpaper();
+    return;
+  }
+  var statusEl = document.getElementById('boot-status');
+  var fillEl = document.getElementById('boot-fill');
+  var extsEl = document.getElementById('boot-exts');
+  var STEPS = [
+    { name: 'System',    icon: 'icon-mac',    vb: '0 0 16 16' },
+    { name: 'About Me',  icon: 'icon-about',  vb: '0 0 32 32' },
+    { name: 'Projects',  icon: 'icon-folder', vb: '0 0 32 32' },
+    { name: 'Writing',   icon: 'icon-doc',    vb: '0 0 32 32' },
+    { name: 'Contact',   icon: 'icon-mail',   vb: '0 0 32 32' },
+    { name: 'Solitaire', icon: 'icon-cards',  vb: '0 0 32 32' },
+    { name: 'Trash',     icon: 'icon-trash',  vb: '0 0 32 32' }
+  ];
+  var timers = [];
+  var done = false;
+  function at(ms, fn){ timers.push(setTimeout(fn, ms)); }
+  function finish(){
+    if (done) return;
+    done = true;
+    timers.forEach(clearTimeout);
+    document.removeEventListener('keydown', finish);
+    bootEl.remove();
+    startWallpaper();
+  }
+  bootEl.addEventListener('mousedown', finish);
+  document.addEventListener('keydown', finish);
+
+  at(900, function(){ bootEl.classList.add('welcome'); });
+  STEPS.forEach(function(s, i){
+    at(1300 + i * 270, function(){
+      statusEl.textContent = 'Loading ' + s.name + '…';
+      /* chunky integer steps, no easing — era-correct */
+      fillEl.style.width = Math.round(((i + 1) / (STEPS.length + 1)) * 100) + '%';
+      extsEl.insertAdjacentHTML('beforeend',
+        '<svg viewBox="' + s.vb + '"><use href="#' + s.icon + '"/></svg>');
+    });
+  });
+  var tEnd = 1300 + STEPS.length * 270;
+  at(tEnd, function(){
+    statusEl.textContent = 'Starting up…';
+    fillEl.style.width = '100%';
+  });
+  at(tEnd + 600, finish);
+})();
 window.addEventListener('resize', function(){
   clampAll();
   life.resize();
