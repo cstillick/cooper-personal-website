@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- EDIT PLACEHOLDERS: search [ to find all of them -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cooper Stillick — Macintosh HD</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   SYSTEM 7 / PLATINUM — flat color borders only.
+   No box-shadow. No gradients (except 1px-step pinstripe).
+   No border-radius except the default button's outer ring.
+   ============================================================ */
+:root{
+  --desktop:#C0C0C0;
+  --chrome-bg:#FFFFFF;
+  --titlebar:#E0E0E0;
+  --inactive:#C0C0C0;
+  --shadow:#888888;
+  --face:#C0C0C0;
+  --font-chrome:'Chicago','Charcoal','Press Start 2P',Geneva,sans-serif;
+  --font-body:Geneva,'Lucida Grande','Helvetica Neue',Helvetica,Arial,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  background:var(--desktop);
+  font-family:var(--font-body);
+  font-size:12px;
+  overflow:hidden;
+  -webkit-font-smoothing:none;
+  font-smooth:never;
+}
+svg{shape-rendering:crispEdges;}
+
+/* ---------------- Menu bar ---------------- */
+#menubar{
+  position:fixed;top:0;left:0;right:0;height:22px;
+  background:#FFFFFF;border-bottom:1px solid #000000;
+  display:flex;align-items:stretch;
+  font-family:var(--font-chrome);font-size:12px;
+  z-index:5000;user-select:none;-webkit-user-select:none;
+}
+#menubar .apple{display:flex;align-items:center;padding:0 10px;cursor:default;}
+.menu{position:relative;display:flex;}
+.mtitle{display:flex;align-items:center;padding:0 10px;cursor:default;white-space:nowrap;}
+.menu.openm > .mtitle{background:#000000;color:#FFFFFF;}
+.mdrop{
+  display:none;position:absolute;top:100%;left:0;min-width:190px;
+  background:#FFFFFF;border:1px solid #000000;
+  font-family:var(--font-chrome);font-size:12px;
+  padding:2px 0;z-index:5001;
+}
+.menu.openm > .mdrop{display:block;}
+.mitem{padding:4px 14px;white-space:nowrap;cursor:default;}
+.mitem:hover{background:#000000;color:#FFFFFF;}
+.mitem.disabled{color:#888888;}
+.mitem.disabled:hover{background:transparent;color:#888888;}
+.msep{border-top:1px solid #AAAAAA;margin:2px 1px;}
+#appname{font-weight:bold;padding:0 10px;display:flex;align-items:center;}
+#mb-right{margin-left:auto;display:flex;align-items:center;gap:10px;padding:0 12px;}
+#clock{white-space:nowrap;}
+#mobile-msg{display:none;align-items:center;padding:0 8px;white-space:nowrap;}
+.micon{width:16px;height:16px;display:block;}
+.ticon{width:14px;height:14px;vertical-align:-2px;}
+.bicon{width:13px;height:13px;vertical-align:-2px;}
+
+/* ---------------- Desktop & icons ---------------- */
+#desktop{position:fixed;inset:22px 0 0 0;overflow:hidden;}
+#icons{
+  position:absolute;top:14px;right:10px;width:76px;
+  display:flex;flex-direction:column;gap:22px;align-items:center;
+  pointer-events:none;
+}
+/* free mode: icons absolutely positioned anywhere on the desktop */
+#icons.free{top:0;right:0;bottom:0;left:0;width:auto;}
+#icons.free .dicon{position:absolute;}
+.dicon{
+  pointer-events:auto;width:76px;display:flex;flex-direction:column;
+  align-items:center;gap:3px;cursor:default;position:relative;
+  user-select:none;-webkit-user-select:none;
+}
+.dicon svg{width:32px;height:32px;display:block;}
+.dicon .dlabel{
+  font-family:var(--font-body);font-size:11px;line-height:13px;
+  padding:0 3px;color:#000000;background:transparent;text-align:center;
+}
+.dicon.selected .dlabel{background:#000000;color:#FFFFFF;}
+.dicon .tip{
+  display:none;position:absolute;right:calc(100% + 6px);top:8px;
+  background:#FFFFFF;border:1px solid #000000;
+  font-family:var(--font-body);font-size:10px;
+  padding:2px 5px;white-space:nowrap;
+}
+.dicon.trash:hover .tip{display:block;}
+
+/* ---------------- Window chrome ---------------- */
+.window{
+  position:fixed;display:none;
+  border:1px solid #000000;background:var(--chrome-bg);
+  z-index:20;
+}
+.window.open{display:block;}
+.win-frame{
+  border-top:1px solid #FFFFFF;border-left:1px solid #FFFFFF;
+  border-bottom:1px solid var(--shadow);border-right:1px solid var(--shadow);
+  display:flex;flex-direction:column;height:100%;
+}
+.titlebar{
+  height:20px;flex:0 0 20px;background:var(--inactive);
+  border-bottom:1px solid #000000;
+  display:flex;align-items:center;padding:0 5px;gap:5px;
+  font-family:var(--font-chrome);font-size:12px;
+  user-select:none;-webkit-user-select:none;cursor:default;
+}
+.window.active .titlebar{
+  /* pinstripes: 1px-step pattern fill, era-correct */
+  background:repeating-linear-gradient(to bottom,
+    var(--titlebar) 0px,var(--titlebar) 1px,
+    #000000 1px,#000000 2px);
+}
+.title{
+  flex:1;text-align:center;overflow:hidden;white-space:nowrap;
+  color:#000000;line-height:18px;
+}
+.window.active .title span{background:#000000;color:#FFFFFF;padding:1px 7px;}
+.tbox{
+  width:12px;height:12px;flex:0 0 12px;
+  border:1px solid #000000;background:var(--titlebar);
+  position:relative;visibility:hidden;cursor:default;
+}
+.window.active .tbox{visibility:visible;outline:2px solid var(--titlebar);}
+.tbox:active{background:#888888;}
+.closebox .inner{
+  position:absolute;left:2px;top:2px;width:6px;height:6px;
+  border:1px solid #000000;background:var(--titlebar);
+}
+.zoombox .inner{
+  position:absolute;left:1px;top:1px;width:7px;height:7px;
+  border:1px solid #000000;background:transparent;
+}
+.win-body{
+  flex:1;overflow:auto;background:#FFFFFF;position:relative;
+  font-family:var(--font-body);font-size:12px;line-height:1.5;
+}
+.grow{
+  position:absolute;right:1px;bottom:1px;width:13px;height:13px;
+  background:#FFFFFF;border-top:1px solid #000000;border-left:1px solid #000000;
+  pointer-events:none;
+}
+.window.active .grow{display:block;}
+
+/* ---------------- Resize handles (invisible hit areas) ---------------- */
+.rs{position:absolute;z-index:40;}
+.rs-n{top:-3px;left:8px;right:8px;height:7px;cursor:ns-resize;}
+.rs-s{bottom:-3px;left:8px;right:8px;height:7px;cursor:ns-resize;}
+.rs-e{right:-3px;top:8px;bottom:8px;width:7px;cursor:ew-resize;}
+.rs-w{left:-3px;top:8px;bottom:8px;width:7px;cursor:ew-resize;}
+.rs-nw{top:-3px;left:-3px;width:11px;height:11px;cursor:nwse-resize;}
+.rs-ne{top:-3px;right:-3px;width:11px;height:11px;cursor:nesw-resize;}
+.rs-sw{bottom:-3px;left:-3px;width:11px;height:11px;cursor:nesw-resize;}
+.rs-se{bottom:-3px;right:-3px;width:14px;height:14px;cursor:nwse-resize;}
+
+/* ---------------- Scrollbars (explicit, classic) ---------------- */
+.win-body{scrollbar-width:auto;scrollbar-color:#C0C0C0 #EEEEEE;}
+.win-body::-webkit-scrollbar{width:16px;height:16px;background:#EEEEEE;}
+.win-body::-webkit-scrollbar-track{
+  background:#EEEEEE;border-left:1px solid #000000;
+}
+.win-body::-webkit-scrollbar-thumb{
+  background:#C0C0C0;border:1px solid #000000;
+}
+.win-body::-webkit-scrollbar-button{display:none;}
+.win-body::-webkit-scrollbar-button:single-button{
+  display:block;height:16px;width:16px;
+  background-color:#C0C0C0;border:1px solid #000000;
+  background-repeat:no-repeat;background-position:center;
+}
+.win-body::-webkit-scrollbar-button:single-button:vertical:decrement{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cg fill='%23000'%3E%3Crect x='4' y='0' width='2' height='2'/%3E%3Crect x='2' y='2' width='6' height='2'/%3E%3Crect x='0' y='4' width='10' height='2'/%3E%3C/g%3E%3C/svg%3E");
+}
+.win-body::-webkit-scrollbar-button:single-button:vertical:increment{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cg fill='%23000'%3E%3Crect x='0' y='0' width='10' height='2'/%3E%3Crect x='2' y='2' width='6' height='2'/%3E%3Crect x='4' y='4' width='2' height='2'/%3E%3C/g%3E%3C/svg%3E");
+}
+.win-body::-webkit-scrollbar-corner{background:#C0C0C0;}
+
+/* ---------------- Buttons ---------------- */
+.btn{
+  display:inline-block;font-family:var(--font-chrome);font-size:12px;
+  color:#000000;text-decoration:none;background:var(--face);
+  border-top:1px solid #FFFFFF;border-left:1px solid #FFFFFF;
+  border-bottom:1px solid var(--shadow);border-right:1px solid var(--shadow);
+  outline:1px solid #000000;
+  padding:4px 14px;cursor:default;user-select:none;-webkit-user-select:none;
+}
+.btn:active{
+  background:#888888;color:#FFFFFF;
+  border-top:1px solid var(--shadow);border-left:1px solid var(--shadow);
+  border-bottom:1px solid #FFFFFF;border-right:1px solid #FFFFFF;
+}
+/* The ONE allowed border-radius: the default button's outer ring */
+.dring{
+  display:inline-block;border:2px solid #000000;border-radius:8px;
+  padding:3px;background:transparent;
+}
+.btn-default{animation:defpulse 1.2s infinite;}
+@keyframes defpulse{0%,100%{opacity:1;}50%{opacity:0.6;}}
+
+/* ---------------- About (Get Info) ---------------- */
+#win-about{width:340px;}
+#win-about .win-body{padding:12px;}
+.info-head{display:flex;gap:12px;align-items:flex-start;margin-bottom:10px;}
+.info-head svg{width:32px;height:32px;flex:0 0 32px;}
+.info-name{font-family:var(--font-chrome);font-size:12px;font-weight:bold;padding-top:2px;}
+.info-bio{margin-top:4px;font-size:11px;}
+.info-rule{border-top:1px solid #888888;margin:8px 0;}
+.info-row{display:flex;margin:3px 0;font-size:11px;}
+.info-label{flex:0 0 76px;text-align:right;font-weight:bold;padding-right:8px;}
+
+/* ---------------- Projects ---------------- */
+#win-projects{width:460px;height:330px;}
+.proj-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:14px 4px;padding:14px 8px;
+}
+.proj-cell{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  cursor:default;user-select:none;-webkit-user-select:none;
+}
+.proj-cell svg{width:32px;height:32px;}
+.proj-cell .plabel{font-size:10px;text-align:center;padding:0 2px;line-height:12px;}
+.proj-cell:active .plabel{background:#000000;color:#FFFFFF;}
+.proj-detail{display:none;padding:12px;}
+.proj-detail.show{display:block;}
+.proj-grid.hide{display:none;}
+.back-link{
+  font-family:var(--font-chrome);font-size:12px;color:#000000;
+  cursor:default;display:inline-block;margin-bottom:10px;
+  user-select:none;-webkit-user-select:none;
+}
+.back-link:hover{background:#000000;color:#FFFFFF;}
+.proj-title{font-family:var(--font-chrome);font-size:12px;font-weight:bold;margin-bottom:8px;}
+.proj-link{display:inline-block;margin-top:12px;color:#000000;font-size:11px;}
+.proj-link:hover{background:#000000;color:#FFFFFF;}
+
+/* ---------------- Resume (SimpleText) ---------------- */
+#win-resume{width:470px;height:380px;}
+.st-toolbar{
+  flex:0 0 auto;background:var(--face);
+  border-bottom:1px solid #000000;
+  padding:4px 6px;display:flex;gap:6px;align-items:center;
+  font-family:var(--font-chrome);font-size:12px;
+  user-select:none;-webkit-user-select:none;
+}
+.st-toolbar .btn{padding:2px 8px;}
+.resume-text{padding:14px;white-space:pre-wrap;font-size:12px;}
+
+/* ---------------- Contact (dialog) ---------------- */
+#win-contact{width:430px;height:190px;}
+#win-contact .win-body{padding:14px;overflow:hidden;}
+.contact-row{display:flex;gap:12px;align-items:flex-start;}
+.contact-row svg{width:32px;height:32px;flex:0 0 32px;}
+.contact-q{font-family:var(--font-chrome);font-size:12px;line-height:1.6;padding-top:4px;}
+.contact-btns{
+  display:flex;gap:16px;justify-content:flex-end;align-items:center;flex-wrap:wrap;
+  margin-top:24px;
+}
+
+/* ---------------- Solitaire app window ---------------- */
+/* 581x595 outer = exactly 577x570 of iframe inside the chrome */
+#win-solitaire{width:581px;height:595px;}
+#win-solitaire .win-body{overflow:hidden;}
+#solitaire-frame{display:block;width:100%;height:100%;border:none;background:#FFFFFF;}
+body.win-dragging iframe{pointer-events:none;}
+
+/* ---------------- Zoom rect ---------------- */
+.zoomrect{
+  position:fixed;border:1px dashed #000000;background:transparent;
+  pointer-events:none;z-index:9999;
+  transition:left 120ms linear,top 120ms linear,width 120ms linear,height 120ms linear;
+}
+
+/* ---------------- Reduced motion ---------------- */
+@media (prefers-reduced-motion: reduce){
+  .btn-default{animation:none;}
+  .zoomrect{transition:none;}
+}
+
+/* ---------------- Mobile ---------------- */
+@media (max-width:767px){
+  #icons{display:none;}
+  .window{display:none !important;}
+  #win-about{
+    display:block !important;
+    left:8px !important;top:40px !important;
+    width:auto !important;right:8px;
+  }
+  .menu,#appname,#mb-right{display:none;}
+  #mobile-msg{display:flex;}
+  .grow{display:none !important;}
+  .rs{display:none !important;}
+}
+</style>
+</head>
+<body>
+
+<!-- Shared pixel-art defs: dither patterns + Kare-style 32x32 icons.
+     Every coordinate is a whole integer. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <pattern id="d50" width="2" height="2" patternUnits="userSpaceOnUse">
+      <rect width="2" height="2" fill="#FFFFFF"/>
+      <rect x="0" y="0" width="1" height="1" fill="#000000"/>
+      <rect x="1" y="1" width="1" height="1" fill="#000000"/>
+    </pattern>
+    <pattern id="d25" width="2" height="2" patternUnits="userSpaceOnUse">
+      <rect width="2" height="2" fill="#FFFFFF"/>
+      <rect x="0" y="0" width="1" height="1" fill="#888888"/>
+    </pattern>
+
+    <symbol id="icon-about" viewBox="0 0 32 32">
+      <g fill="#000000">
+        <rect x="13" y="4" width="6" height="1"/>
+        <rect x="12" y="5" width="8" height="1"/>
+        <rect x="11" y="6" width="10" height="5"/>
+        <rect x="12" y="11" width="8" height="1"/>
+        <rect x="13" y="12" width="6" height="1"/>
+        <rect x="14" y="13" width="4" height="2"/>
+        <rect x="10" y="15" width="12" height="1"/>
+        <rect x="9" y="16" width="14" height="1"/>
+        <rect x="8" y="17" width="16" height="1"/>
+        <rect x="7" y="18" width="1" height="10"/>
+        <rect x="24" y="18" width="1" height="10"/>
+        <rect x="7" y="28" width="18" height="1"/>
+      </g>
+      <rect x="8" y="18" width="16" height="10" fill="url(#d50)"/>
+    </symbol>
+
+    <symbol id="icon-folder" viewBox="0 0 32 32">
+      <rect x="3" y="6" width="11" height="3" fill="#000000"/>
+      <rect x="4" y="7" width="9" height="2" fill="#FFFFFF"/>
+      <rect x="2" y="9" width="28" height="16" fill="#000000"/>
+      <rect x="3" y="10" width="26" height="14" fill="#FFFFFF"/>
+      <rect x="4" y="9" width="9" height="1" fill="#FFFFFF"/>
+      <rect x="3" y="22" width="26" height="2" fill="url(#d25)"/>
+    </symbol>
+
+    <symbol id="icon-doc" viewBox="0 0 32 32">
+      <g fill="#FFFFFF">
+        <rect x="8" y="4" width="11" height="25"/>
+        <rect x="19" y="8" width="5" height="21"/>
+      </g>
+      <g fill="#000000">
+        <rect x="7" y="3" width="13" height="1"/>
+        <rect x="7" y="4" width="1" height="25"/>
+        <rect x="7" y="29" width="18" height="1"/>
+        <rect x="24" y="8" width="1" height="21"/>
+        <rect x="19" y="4" width="1" height="4"/>
+        <rect x="19" y="7" width="6" height="1"/>
+        <rect x="20" y="4" width="1" height="1"/>
+        <rect x="21" y="5" width="1" height="1"/>
+        <rect x="22" y="6" width="1" height="1"/>
+        <rect x="23" y="7" width="1" height="1"/>
+        <rect x="10" y="12" width="10" height="1"/>
+        <rect x="10" y="15" width="12" height="1"/>
+        <rect x="10" y="18" width="12" height="1"/>
+        <rect x="10" y="21" width="12" height="1"/>
+        <rect x="10" y="24" width="8" height="1"/>
+      </g>
+    </symbol>
+
+    <symbol id="icon-mail" viewBox="0 0 32 32">
+      <rect x="3" y="8" width="26" height="16" fill="#000000"/>
+      <rect x="4" y="9" width="24" height="14" fill="#FFFFFF"/>
+      <g fill="#000000">
+        <rect x="4" y="9" width="2" height="1"/>
+        <rect x="6" y="10" width="2" height="1"/>
+        <rect x="8" y="11" width="2" height="1"/>
+        <rect x="10" y="12" width="2" height="1"/>
+        <rect x="12" y="13" width="2" height="1"/>
+        <rect x="14" y="14" width="2" height="1"/>
+        <rect x="26" y="9" width="2" height="1"/>
+        <rect x="24" y="10" width="2" height="1"/>
+        <rect x="22" y="11" width="2" height="1"/>
+        <rect x="20" y="12" width="2" height="1"/>
+        <rect x="18" y="13" width="2" height="1"/>
+        <rect x="16" y="14" width="2" height="1"/>
+      </g>
+    </symbol>
+
+    <symbol id="icon-apple" viewBox="0 0 16 16">
+      <g fill="#000000">
+        <rect x="9" y="1" width="3" height="1"/>
+        <rect x="8" y="2" width="3" height="1"/>
+        <rect x="8" y="3" width="2" height="1"/>
+        <rect x="4" y="4" width="3" height="1"/>
+        <rect x="9" y="4" width="3" height="1"/>
+        <rect x="3" y="5" width="10" height="1"/>
+        <rect x="2" y="6" width="12" height="1"/>
+        <rect x="2" y="7" width="11" height="1"/>
+        <rect x="2" y="8" width="10" height="1"/>
+        <rect x="2" y="9" width="10" height="1"/>
+        <rect x="2" y="10" width="11" height="1"/>
+        <rect x="2" y="11" width="12" height="1"/>
+        <rect x="3" y="12" width="10" height="1"/>
+        <rect x="3" y="13" width="10" height="1"/>
+        <rect x="4" y="14" width="3" height="1"/>
+        <rect x="9" y="14" width="3" height="1"/>
+      </g>
+    </symbol>
+
+    <symbol id="icon-x" viewBox="0 0 12 12">
+      <g fill="#000000">
+        <rect x="0" y="0" width="2" height="2"/>
+        <rect x="1" y="1" width="2" height="2"/>
+        <rect x="2" y="2" width="2" height="2"/>
+        <rect x="3" y="3" width="2" height="2"/>
+        <rect x="4" y="4" width="2" height="2"/>
+        <rect x="5" y="5" width="2" height="2"/>
+        <rect x="6" y="6" width="2" height="2"/>
+        <rect x="7" y="7" width="2" height="2"/>
+        <rect x="8" y="8" width="2" height="2"/>
+        <rect x="9" y="9" width="2" height="2"/>
+        <rect x="10" y="10" width="2" height="2"/>
+        <rect x="10" y="0" width="2" height="2"/>
+        <rect x="9" y="1" width="2" height="2"/>
+        <rect x="8" y="2" width="2" height="2"/>
+        <rect x="7" y="3" width="2" height="2"/>
+        <rect x="6" y="4" width="2" height="2"/>
+        <rect x="4" y="6" width="2" height="2"/>
+        <rect x="3" y="7" width="2" height="2"/>
+        <rect x="2" y="8" width="2" height="2"/>
+        <rect x="1" y="9" width="2" height="2"/>
+        <rect x="0" y="10" width="2" height="2"/>
+      </g>
+    </symbol>
+
+    <symbol id="icon-linkedin" viewBox="0 0 12 12">
+      <g fill="#000000">
+        <rect x="1" y="0" width="2" height="2"/>
+        <rect x="1" y="3" width="2" height="8"/>
+        <rect x="5" y="3" width="2" height="8"/>
+        <rect x="6" y="3" width="4" height="2"/>
+        <rect x="9" y="5" width="2" height="6"/>
+      </g>
+    </symbol>
+
+    <symbol id="icon-mac" viewBox="0 0 16 16">
+      <rect x="2" y="0" width="12" height="13" fill="#000000"/>
+      <rect x="3" y="1" width="10" height="11" fill="#FFFFFF"/>
+      <rect x="4" y="2" width="8" height="6" fill="#000000"/>
+      <rect x="5" y="3" width="6" height="4" fill="#FFFFFF"/>
+      <rect x="9" y="10" width="3" height="1" fill="#000000"/>
+      <rect x="4" y="13" width="8" height="2" fill="#000000"/>
+      <rect x="5" y="14" width="6" height="1" fill="#888888"/>
+    </symbol>
+
+    <symbol id="icon-cards" viewBox="0 0 32 32">
+      <rect x="5" y="3" width="16" height="22" fill="#000000"/>
+      <rect x="6" y="4" width="14" height="20" fill="#FFFFFF"/>
+      <rect x="7" y="5" width="12" height="18" fill="url(#d25)"/>
+      <rect x="11" y="8" width="16" height="22" fill="#000000"/>
+      <rect x="12" y="9" width="14" height="20" fill="#FFFFFF"/>
+      <g fill="#000000">
+        <rect x="18" y="12" width="2" height="1"/>
+        <rect x="17" y="13" width="4" height="1"/>
+        <rect x="16" y="14" width="6" height="1"/>
+        <rect x="15" y="15" width="8" height="1"/>
+        <rect x="15" y="16" width="8" height="1"/>
+        <rect x="16" y="17" width="6" height="1"/>
+        <rect x="18" y="18" width="2" height="1"/>
+        <rect x="17" y="19" width="4" height="1"/>
+      </g>
+    </symbol>
+
+    <symbol id="icon-trash" viewBox="0 0 32 32">
+      <rect x="10" y="9" width="12" height="17" fill="#FFFFFF"/>
+      <g fill="#888888">
+        <rect x="12" y="11" width="1" height="13"/>
+        <rect x="15" y="11" width="1" height="13"/>
+        <rect x="18" y="11" width="1" height="13"/>
+      </g>
+      <g fill="#000000">
+        <rect x="13" y="2" width="6" height="1"/>
+        <rect x="12" y="3" width="1" height="2"/>
+        <rect x="19" y="3" width="1" height="2"/>
+        <rect x="7" y="5" width="18" height="2"/>
+        <rect x="9" y="8" width="14" height="1"/>
+        <rect x="9" y="9" width="1" height="17"/>
+        <rect x="22" y="9" width="1" height="17"/>
+        <rect x="9" y="26" width="14" height="1"/>
+      </g>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- ================= MENU BAR ================= -->
+<div id="menubar">
+  <div class="menu" id="menu-apple">
+    <div class="mtitle apple"><svg class="micon" viewBox="0 0 16 16"><use href="#icon-apple"/></svg></div>
+    <div class="mdrop">
+      <div class="mitem" data-action="about">About This Website&hellip;</div>
+      <div class="msep"></div>
+      <div class="mitem disabled">Control Panels</div>
+      <div class="mitem disabled">Chooser</div>
+    </div>
+  </div>
+  <div id="appname">Finder</div>
+  <div class="menu">
+    <div class="mtitle">File</div>
+    <div class="mdrop">
+      <div class="mitem disabled">New Folder</div>
+      <div class="mitem disabled">Open</div>
+      <div class="mitem" data-action="close">Close Window</div>
+      <div class="msep"></div>
+      <div class="mitem" data-action="about">Get Info</div>
+      <div class="msep"></div>
+      <div class="mitem disabled">Quit</div>
+    </div>
+  </div>
+  <div class="menu">
+    <div class="mtitle">Edit</div>
+    <div class="mdrop">
+      <div class="mitem disabled">Undo</div>
+      <div class="msep"></div>
+      <div class="mitem disabled">Cut</div>
+      <div class="mitem disabled">Copy</div>
+      <div class="mitem disabled">Paste</div>
+      <div class="mitem disabled">Clear</div>
+      <div class="msep"></div>
+      <div class="mitem disabled">Select All</div>
+    </div>
+  </div>
+  <div class="menu">
+    <div class="mtitle">View</div>
+    <div class="mdrop">
+      <div class="mitem">&#10003; by Icon</div>
+      <div class="mitem disabled">by Name</div>
+      <div class="mitem disabled">by Size</div>
+      <div class="mitem disabled">by Date</div>
+    </div>
+  </div>
+  <div class="menu">
+    <div class="mtitle">Special</div>
+    <div class="mdrop">
+      <div class="mitem" data-action="cleanup">Clean Up Desktop</div>
+      <div class="mitem disabled">Empty Trash&hellip;</div>
+      <div class="msep"></div>
+      <div class="mitem" data-action="restart">Restart</div>
+      <div class="mitem disabled">Shut Down</div>
+    </div>
+  </div>
+  <div class="menu">
+    <div class="mtitle">Help</div>
+    <div class="mdrop">
+      <div class="mitem" data-action="about">About This Website&hellip;</div>
+      <div class="mitem disabled">Show Balloons</div>
+    </div>
+  </div>
+  <div id="mobile-msg">Mac OS requires a larger display&nbsp;<svg class="micon" viewBox="0 0 16 16"><use href="#icon-mac"/></svg></div>
+  <div id="mb-right">
+    <svg id="battery" width="20" height="12" viewBox="0 0 20 12" aria-hidden="true">
+      <rect x="0" y="2" width="18" height="8" fill="#000000"/>
+      <rect x="1" y="3" width="16" height="6" fill="#FFFFFF"/>
+      <rect x="2" y="4" width="3" height="4" fill="#000000"/>
+      <rect x="6" y="4" width="3" height="4" fill="#000000"/>
+      <rect x="10" y="4" width="3" height="4" fill="#000000"/>
+      <rect x="18" y="4" width="2" height="4" fill="#000000"/>
+    </svg>
+    <span id="clock">&hellip;</span>
+  </div>
+</div>
+
+<!-- ================= DESKTOP ================= -->
+<div id="desktop">
+
+  <div id="icons">
+    <div class="dicon" id="dicon-about" data-win="about">
+      <svg viewBox="0 0 32 32"><use href="#icon-about"/></svg>
+      <div class="dlabel">About Me</div>
+    </div>
+    <div class="dicon" id="dicon-projects" data-win="projects">
+      <svg viewBox="0 0 32 32"><use href="#icon-folder"/></svg>
+      <div class="dlabel">Projects</div>
+    </div>
+    <div class="dicon" id="dicon-resume" data-win="resume">
+      <svg viewBox="0 0 32 32"><use href="#icon-doc"/></svg>
+      <div class="dlabel">Writing</div>
+    </div>
+    <div class="dicon" id="dicon-contact" data-win="contact">
+      <svg viewBox="0 0 32 32"><use href="#icon-mail"/></svg>
+      <div class="dlabel">Contact</div>
+    </div>
+    <div class="dicon" id="dicon-solitaire" data-win="solitaire">
+      <svg viewBox="0 0 32 32"><use href="#icon-cards"/></svg>
+      <div class="dlabel">Solitaire</div>
+    </div>
+    <div class="dicon trash" id="dicon-trash">
+      <svg viewBox="0 0 32 32"><use href="#icon-trash"/></svg>
+      <div class="dlabel">Trash</div>
+      <div class="tip">Trash (0 items)</div>
+    </div>
+  </div>
+
+  <!-- ===== About window (Get Info) ===== -->
+  <div class="window open active" id="win-about" data-app="Finder" data-x="170" data-y="110">
+    <div class="win-frame">
+      <div class="titlebar">
+        <div class="tbox closebox"><div class="inner"></div></div>
+        <div class="title"><span>About Cooper Stillick</span></div>
+        <div class="tbox zoombox"><div class="inner"></div></div>
+      </div>
+      <div class="win-body">
+        <div style="padding:12px;">
+          <div class="info-head">
+            <svg viewBox="0 0 32 32"><use href="#icon-about"/></svg>
+            <div>
+              <div class="info-name">Cooper Stillick</div>
+              <div class="info-bio">I find problems and fix them</div>
+            </div>
+          </div>
+          <div class="info-rule"></div>
+          <div class="info-row"><span class="info-label">Kind:</span><span>Human</span></div>
+          <div class="info-row"><span class="info-label">Size:</span><span>Unknown</span></div>
+          <div class="info-row"><span class="info-label">Where:</span><span>The Internet</span></div>
+          <div class="info-row"><span class="info-label">Created:</span><span>Tue Jun 9, 2026</span></div>
+          <div class="info-row"><span class="info-label">Modified:</span><span>Today</span></div>
+          <div class="info-rule"></div>
+          <div class="info-row"><span class="info-label">Bio:</span><span>Student developer interested in Fintech, policy, and building for the future</span></div>
+          <div class="info-row"><span class="info-label">Location:</span><span>Oklahoma City, OK</span></div>
+        </div>
+      </div>
+      <div class="grow">
+        <svg width="13" height="13" viewBox="0 0 13 13">
+          <path d="M12 1 L1 12" stroke="#888888" stroke-width="1" fill="none"/>
+          <path d="M12 5 L5 12" stroke="#888888" stroke-width="1" fill="none"/>
+          <path d="M12 9 L9 12" stroke="#888888" stroke-width="1" fill="none"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Projects window ===== -->
+  <div class="window open" id="win-projects" data-app="Finder" data-x="540" data-y="150">
+    <div class="win-frame">
+      <div class="titlebar">
+        <div class="tbox closebox"><div class="inner"></div></div>
+        <div class="title"><span><svg class="ticon" viewBox="0 0 32 32"><use href="#icon-folder"/></svg> Projects</span></div>
+        <div class="tbox zoombox"><div class="inner"></div></div>
+      </div>
+      <div class="win-body">
+        <div class="proj-grid">
+          <div class="proj-cell" data-name="Corridor" data-desc="Agent-native metering, pricing, and policy infrastructure for APIs. Corridor attributes every metered event to an AI agent identity — scoped, budgeted, rate-limited, and audited independently — authorizes and reserves capacity before each call lands, applies a pricing DSL per event, and settles to whatever payment rail the provider configures (Stripe Connect, x402, or invoice/ACH).">
+            <svg viewBox="0 0 32 32"><use href="#icon-folder"/></svg>
+            <div class="plabel">Corridor</div>
+          </div>
+          <div class="proj-cell" data-name="Backtesting Engine" data-url="https://github.com/cstillick/backtesting-engine" data-desc="From-scratch Python backtesting engine for algorithmic trading strategies — pluggable strategy interface, bar-by-bar event loop, slippage and commission simulation, and a performance tearsheet (CAGR, Sharpe, Sortino, max drawdown).">
+            <svg viewBox="0 0 32 32"><use href="#icon-folder"/></svg>
+            <div class="plabel">Backtesting Engine</div>
+          </div>
+          <div class="proj-cell" data-name="Crypto Arbitrage" data-url="https://github.com/cstillick/crypto-arbitrage" data-desc="Real-time cross-exchange arbitrage detector streaming Binance and Coinbase best bid/ask via WebSocket into an asyncio-safe price store, computing fee-adjusted spreads every 0.5s and surfacing opportunities in a live Rich terminal UI.">
+            <svg viewBox="0 0 32 32"><use href="#icon-doc"/></svg>
+            <div class="plabel">Crypto Arbitrage</div>
+          </div>
+          <div class="proj-cell" data-name="Stock Screener" data-url="https://github.com/cstillick/stock-screener" data-desc="Full-stack S&amp;P 500 stock screener — FastAPI backend with vectorized pandas indicators (SMA/EMA/RSI/MACD/Bollinger/ATR), composable named signals like golden_cross and bb_squeeze, concurrent yFinance fetching with parquet caching, and a single-page HTML/JS frontend. No database required.">
+            <svg viewBox="0 0 32 32"><use href="#icon-folder"/></svg>
+            <div class="plabel">Stock Screener</div>
+          </div>
+          <div class="proj-cell" data-name="Fraud Detection" data-url="https://github.com/cstillick/fraud-detection" data-desc="Real-time credit card fraud detection ML pipeline — XGBoost classifier with a tuned decision threshold on 284,807 transactions, SHAP explainability surfacing the top feature drivers per prediction (FCRA/ECOA adverse-action compliance), served via a FastAPI inference endpoint.">
+            <svg viewBox="0 0 32 32"><use href="#icon-doc"/></svg>
+            <div class="plabel">Fraud Detection</div>
+          </div>
+          <div class="proj-cell" data-name="DNS Resolver" data-url="https://github.com/cstillick/dns-resolver" data-desc="DNS resolver built from scratch on raw UDP sockets — no dnspython. Manually parses and serializes RFC 1035 wire format (including pointer compression and glue records) and resolves names iteratively from the root nameservers, following CNAME chains. Supports A, AAAA, MX, CNAME, TXT, and NS records.">
+            <svg viewBox="0 0 32 32"><use href="#icon-doc"/></svg>
+            <div class="plabel">DNS Resolver</div>
+          </div>
+        </div>
+        <div class="proj-detail">
+          <span class="back-link">&larr; Back</span>
+          <div class="proj-title"></div>
+          <div class="proj-desc"></div>
+          <a class="proj-link" href="#" target="_blank" rel="noopener">View on GitHub &rarr;</a>
+        </div>
+      </div>
+      <div class="grow">
+        <svg width="13" height="13" viewBox="0 0 13 13">
+          <path d="M12 1 L1 12" stroke="#888888" stroke-width="1" fill="none"/>
+          <path d="M12 5 L5 12" stroke="#888888" stroke-width="1" fill="none"/>
+          <path d="M12 9 L9 12" stroke="#888888" stroke-width="1" fill="none"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Resume window (SimpleText) ===== -->
+  <div class="window" id="win-resume" data-app="SimpleText" data-x="330" data-y="130">
+    <div class="win-frame">
+      <div class="titlebar">
+        <div class="tbox closebox"><div class="inner"></div></div>
+        <div class="title"><span>Cooper Stillick Resume.txt</span></div>
+        <div class="tbox zoombox"><div class="inner"></div></div>
+      </div>
+      <div class="st-toolbar">
+        <span class="btn" aria-disabled="true"><b>B</b></span>
+        <span class="btn" aria-disabled="true"><i>I</i></span>
+        <span class="btn" aria-disabled="true">Size &#9662;</span>
+      </div>
+      <div class="win-body">
+        <div class="resume-text">[RESUME CONTENT]</div>
+      </div>
+      <div class="grow">
+        <svg width="13" height="13" viewBox="0 0 13 13">
+          <path d="M12 1 L1 12" stroke="#888888" stroke-width="1" fill="none"/>
+          <path d="M12 5 L5 12" stroke="#888888" stroke-width="1" fill="none"/>
+          <path d="M12 9 L9 12" stroke="#888888" stroke-width="1" fill="none"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Solitaire application window ===== -->
+  <div class="window" id="win-solitaire" data-app="Solitaire" data-x="230" data-y="50">
+    <div class="win-frame">
+      <div class="titlebar">
+        <div class="tbox closebox"><div class="inner"></div></div>
+        <div class="title"><span>Solitaire</span></div>
+        <div class="tbox zoombox"><div class="inner"></div></div>
+      </div>
+      <div class="win-body">
+        <iframe id="solitaire-frame" data-src="solitaire.html" title="Solitaire"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Contact dialog (fixed, centered, not draggable) ===== -->
+  <div class="window no-drag" id="win-contact" data-app="Finder">
+    <div class="win-frame">
+      <div class="titlebar">
+        <div class="tbox closebox"><div class="inner"></div></div>
+        <div class="title"><span>Contact</span></div>
+      </div>
+      <div class="win-body">
+        <div class="contact-row">
+          <svg viewBox="0 0 32 32"><use href="#icon-mail"/></svg>
+          <div class="contact-q">How would you like to reach out?</div>
+        </div>
+        <div class="contact-btns">
+          <a class="btn" href="https://www.linkedin.com/in/cooper-stillick/" target="_blank" rel="noopener"><svg class="bicon" viewBox="0 0 12 12"><use href="#icon-linkedin"/></svg> LinkedIn</a>
+          <a class="btn" href="https://x.com/Cooper80330725" target="_blank" rel="noopener"><svg class="bicon" viewBox="0 0 12 12"><use href="#icon-x"/></svg> Twitter</a>
+          <span class="dring"><a class="btn btn-default" href="mailto:cestillick@wm.edu"><svg class="bicon" viewBox="0 0 32 32"><use href="#icon-mail"/></svg> Email &#8629;</a></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+'use strict';
+var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+var MB = 22;            // menu bar height
+var zTop = 30;
+var appname = document.getElementById('appname');
+var desktop = document.getElementById('desktop');
+
+/* ---------- window registry ---------- */
+var wins = {};
+['about','projects','resume','contact','solitaire'].forEach(function(id){
+  wins[id] = {
+    el: document.getElementById('win-' + id),
+    icon: document.getElementById('dicon-' + id)
+  };
+});
+
+/* minimum window sizes (solitaire = its default, so the game never clips) */
+var MIN = {
+  about:     { w: 280, h: 160 },
+  projects:  { w: 340, h: 240 },
+  resume:    { w: 300, h: 220 },
+  contact:   { w: 360, h: 190 },
+  solitaire: { w: 581, h: 595 }
+};
+
+/* apply default positions + sizes from data attributes / CSS */
+function placeDefaults(){
+  Object.keys(wins).forEach(function(id){
+    var el = wins[id].el;
+    el.style.width = '';
+    el.style.height = '';
+    delete el.dataset.prevRect;
+    if (el.dataset.x){ el.style.left = el.dataset.x + 'px'; el.style.top = el.dataset.y + 'px'; }
+  });
+  clampAll();
+}
+function clamp(el){
+  if (!el.classList.contains('open')) return;
+  var r = el.getBoundingClientRect();
+  var x = Math.max(0, Math.min(r.left, window.innerWidth - r.width));
+  var y = Math.max(MB, Math.min(r.top, window.innerHeight - r.height));
+  el.style.left = x + 'px';
+  el.style.top = y + 'px';
+}
+function clampAll(){
+  Object.keys(wins).forEach(function(id){ clamp(wins[id].el); });
+}
+
+/* ---------- focus management ---------- */
+function setActive(id){
+  Object.keys(wins).forEach(function(k){
+    wins[k].el.classList.toggle('active', k === id);
+  });
+  appname.textContent = id ? (wins[id].el.dataset.app || 'Finder') : 'Finder';
+}
+function bringToFront(id){
+  wins[id].el.style.zIndex = ++zTop;
+  setActive(id);
+}
+
+/* ---------- zoom-rect animation ---------- */
+function zoomRect(from, to, done){
+  if (reduced){ done(); return; }
+  var d = document.createElement('div');
+  d.className = 'zoomrect';
+  d.style.left = from.left + 'px';
+  d.style.top = from.top + 'px';
+  d.style.width = from.width + 'px';
+  d.style.height = from.height + 'px';
+  document.body.appendChild(d);
+  var finished = false;
+  function finish(){
+    if (finished) return;
+    finished = true;
+    d.remove();
+    done();
+  }
+  requestAnimationFrame(function(){ requestAnimationFrame(function(){
+    d.style.left = to.left + 'px';
+    d.style.top = to.top + 'px';
+    d.style.width = to.width + 'px';
+    d.style.height = to.height + 'px';
+  });});
+  d.addEventListener('transitionend', finish, { once: true });
+  setTimeout(finish, 250); /* safety net */
+}
+
+/* ---------- open / close ---------- */
+function openWin(id){
+  var w = wins[id];
+  if (id === 'solitaire'){
+    var fr = document.getElementById('solitaire-frame');
+    if (!fr.getAttribute('src')) fr.src = fr.dataset.src;
+  }
+  if (w.el.classList.contains('open')){
+    bringToFront(id);
+    if (w.icon) w.icon.classList.add('selected');
+    return;
+  }
+  /* measure target rect invisibly */
+  w.el.style.visibility = 'hidden';
+  w.el.classList.add('open');
+  if (id === 'contact'){
+    var r0 = w.el.getBoundingClientRect();
+    w.el.style.left = Math.max(0, (window.innerWidth - r0.width) / 2) + 'px';
+    w.el.style.top = Math.max(MB, (window.innerHeight - r0.height) / 2) + 'px';
+  }
+  clamp(w.el);
+  var target = w.el.getBoundingClientRect();
+  w.el.classList.remove('open');
+  w.el.style.visibility = '';
+  var from = w.icon ? w.icon.getBoundingClientRect()
+                    : { left: target.left + target.width / 2, top: target.top + target.height / 2, width: 0, height: 0 };
+  if (w.icon) w.icon.classList.add('selected');
+  zoomRect(from, target, function(){
+    w.el.classList.add('open');
+    bringToFront(id);
+  });
+}
+function closeWin(id){
+  var w = wins[id];
+  if (!w.el.classList.contains('open')) return;
+  var from = w.el.getBoundingClientRect();
+  w.el.classList.remove('open', 'active');
+  if (w.icon) w.icon.classList.remove('selected');
+  var to = w.icon ? w.icon.getBoundingClientRect()
+                  : { left: from.left + from.width / 2, top: from.top + from.height / 2, width: 0, height: 0 };
+  zoomRect(from, to, function(){});
+  setActive(null);
+}
+function activeId(){
+  var best = null, bestZ = -1;
+  Object.keys(wins).forEach(function(id){
+    var el = wins[id].el;
+    if (el.classList.contains('open') && el.classList.contains('active')) best = id;
+  });
+  if (best) return best;
+  Object.keys(wins).forEach(function(id){
+    var el = wins[id].el;
+    var z = parseInt(el.style.zIndex || 0, 10);
+    if (el.classList.contains('open') && z > bestZ){ bestZ = z; best = id; }
+  });
+  return best;
+}
+
+/* ---------- dragging (titlebar only, mouse + touch) ---------- */
+function makeDraggable(id){
+  var el = wins[id].el;
+  var bar = el.querySelector('.titlebar');
+  function start(e){
+    if (e.target.closest('.tbox')) return;
+    if (el.classList.contains('no-drag')) return;
+    document.body.classList.add('win-dragging');
+    var p = e.touches ? e.touches[0] : e;
+    var r = el.getBoundingClientRect();
+    var ox = p.clientX - r.left, oy = p.clientY - r.top;
+    function move(ev){
+      var q = ev.touches ? ev.touches[0] : ev;
+      var x = q.clientX - ox, y = q.clientY - oy;
+      x = Math.max(0, Math.min(x, window.innerWidth - r.width));
+      y = Math.max(MB, Math.min(y, window.innerHeight - r.height));
+      el.style.left = x + 'px';
+      el.style.top = y + 'px';
+      if (ev.cancelable) ev.preventDefault();
+    }
+    function up(){
+      document.body.classList.remove('win-dragging');
+      document.removeEventListener('mousemove', move);
+      document.removeEventListener('mouseup', up);
+      document.removeEventListener('touchmove', move);
+      document.removeEventListener('touchend', up);
+    }
+    document.addEventListener('mousemove', move);
+    document.addEventListener('mouseup', up);
+    document.addEventListener('touchmove', move, { passive: false });
+    document.addEventListener('touchend', up);
+  }
+  bar.addEventListener('mousedown', start);
+  bar.addEventListener('touchstart', start, { passive: true });
+}
+
+/* ---------- resizing (all four sides + corners) ---------- */
+function makeResizable(id){
+  var el = wins[id].el;
+  ['n','s','e','w','ne','nw','se','sw'].forEach(function(dir){
+    var h = document.createElement('div');
+    h.className = 'rs rs-' + dir;
+    h.dataset.dir = dir;
+    h.addEventListener('mousedown', startResize);
+    h.addEventListener('touchstart', startResize, { passive: false });
+    el.appendChild(h);
+  });
+  function startResize(e){
+    if (e.type === 'mousedown' && e.button !== 0) return;
+    var dir = e.currentTarget.dataset.dir;
+    e.preventDefault();
+    e.stopPropagation();
+    bringToFront(id);
+    delete el.dataset.prevRect; /* manual resize becomes the new "user state" for zoom */
+    document.body.classList.add('win-dragging');
+    var p = e.touches ? e.touches[0] : e;
+    var r = el.getBoundingClientRect();
+    var sx = p.clientX, sy = p.clientY;
+    var min = MIN[id] || { w: 200, h: 120 };
+    function move(ev){
+      var q = ev.touches ? ev.touches[0] : ev;
+      var dx = q.clientX - sx, dy = q.clientY - sy;
+      var L = r.left, T = r.top, W = r.width, H = r.height;
+      if (dir.indexOf('e') > -1) W = Math.min(r.width + dx, window.innerWidth - r.left);
+      if (dir.indexOf('s') > -1) H = Math.min(r.height + dy, window.innerHeight - r.top);
+      if (dir.indexOf('w') > -1){ L = Math.max(0, r.left + dx); W = r.right - L; }
+      if (dir.indexOf('n') > -1){ T = Math.max(MB, r.top + dy); H = r.bottom - T; }
+      if (W < min.w){ if (dir.indexOf('w') > -1) L = r.right - min.w; W = min.w; }
+      if (H < min.h){ if (dir.indexOf('n') > -1) T = r.bottom - min.h; H = min.h; }
+      el.style.left = L + 'px';
+      el.style.top = T + 'px';
+      el.style.width = W + 'px';
+      el.style.height = H + 'px';
+      if (ev.cancelable) ev.preventDefault();
+    }
+    function up(){
+      document.body.classList.remove('win-dragging');
+      document.removeEventListener('mousemove', move);
+      document.removeEventListener('mouseup', up);
+      document.removeEventListener('touchmove', move);
+      document.removeEventListener('touchend', up);
+    }
+    document.addEventListener('mousemove', move);
+    document.addEventListener('mouseup', up);
+    document.addEventListener('touchmove', move, { passive: false });
+    document.addEventListener('touchend', up);
+  }
+}
+
+/* ---------- zoom box: toggle current size <-> enlarged (not full-screen) ---------- */
+function applyRect(el, r){
+  el.style.left = r.left + 'px';
+  el.style.top = r.top + 'px';
+  el.style.width = r.width + 'px';
+  el.style.height = r.height + 'px';
+}
+function toggleZoom(id){
+  var el = wins[id].el;
+  if (!el.classList.contains('open')) return;
+  bringToFront(id);
+  var cur = el.getBoundingClientRect();
+  var target;
+  if (el.dataset.prevRect){
+    target = JSON.parse(el.dataset.prevRect);
+    delete el.dataset.prevRect;
+  } else {
+    var min = MIN[id] || { w: 200, h: 120 };
+    var w = Math.max(min.w, Math.round(window.innerWidth * 0.85));
+    var h = Math.max(min.h, Math.round((window.innerHeight - MB) * 0.85));
+    var l = Math.max(0, Math.round((window.innerWidth - w) / 2));
+    var t = Math.max(MB, MB + Math.round((window.innerHeight - MB - h) / 2));
+    el.dataset.prevRect = JSON.stringify({ left: cur.left, top: cur.top, width: cur.width, height: cur.height });
+    target = { left: l, top: t, width: w, height: h };
+  }
+  zoomRect(cur, target, function(){ applyRect(el, target); });
+}
+
+/* ---------- messages from the Solitaire app ---------- */
+window.addEventListener('message', function(e){
+  if (e.data === 'solitaire-quit') closeWin('solitaire');
+  else if (e.data === 'solitaire-focus') bringToFront('solitaire');
+});
+
+/* ---------- wire up windows ---------- */
+Object.keys(wins).forEach(function(id){
+  var el = wins[id].el;
+  el.addEventListener('mousedown', function(){ bringToFront(id); });
+  el.querySelector('.closebox').addEventListener('click', function(e){
+    e.stopPropagation();
+    closeWin(id);
+  });
+  var zb = el.querySelector('.zoombox');
+  if (zb) zb.addEventListener('click', function(e){ e.stopPropagation(); toggleZoom(id); });
+  makeDraggable(id);
+  makeResizable(id);
+});
+
+/* ---------- desktop icons ---------- */
+function deselectIcons(){
+  document.querySelectorAll('.dicon.selected').forEach(function(i){
+    /* keep icons of open windows selected */
+    var winId = i.dataset.win;
+    if (!winId || !wins[winId].el.classList.contains('open')) i.classList.remove('selected');
+  });
+}
+document.querySelectorAll('.dicon').forEach(function(icon){
+  icon.addEventListener('click', function(e){
+    e.stopPropagation();
+    document.querySelectorAll('.dicon.selected').forEach(function(i){
+      var winId = i.dataset.win;
+      if (i !== icon && (!winId || !wins[winId].el.classList.contains('open'))) i.classList.remove('selected');
+    });
+    icon.classList.add('selected');
+  });
+  icon.addEventListener('dblclick', function(e){
+    e.stopPropagation();
+    if (icon.dataset.win) openWin(icon.dataset.win);
+  });
+});
+
+/* ---------- icon dragging / rearranging ---------- */
+var iconsBox = document.getElementById('icons');
+var dicons = Array.prototype.slice.call(document.querySelectorAll('.dicon'));
+var iconsMoved = false;
+
+/* measure the flex-flow default layout, then switch to free (absolute) mode */
+function layoutIcons(){
+  iconsBox.classList.remove('free');
+  dicons.forEach(function(ic){ ic.style.left = ''; ic.style.top = ''; });
+  var dr = desktop.getBoundingClientRect();
+  var pos = dicons.map(function(ic){
+    var r = ic.getBoundingClientRect();
+    return { x: r.left - dr.left, y: r.top - dr.top };
+  });
+  iconsBox.classList.add('free');
+  dicons.forEach(function(ic, i){
+    ic.style.left = pos[i].x + 'px';
+    ic.style.top = pos[i].y + 'px';
+  });
+  iconsMoved = false;
+}
+function clampIcons(){
+  dicons.forEach(function(ic){
+    var x = parseInt(ic.style.left, 10) || 0;
+    var y = parseInt(ic.style.top, 10) || 0;
+    x = Math.max(0, Math.min(x, desktop.clientWidth - ic.offsetWidth));
+    y = Math.max(0, Math.min(y, desktop.clientHeight - ic.offsetHeight));
+    ic.style.left = x + 'px';
+    ic.style.top = y + 'px';
+  });
+}
+function makeIconDraggable(icon){
+  function start(e){
+    if (e.type === 'mousedown' && e.button !== 0) return;
+    /* select on mousedown, like the real Finder */
+    dicons.forEach(function(i){
+      var winId = i.dataset.win;
+      if (i !== icon && (!winId || !wins[winId].el.classList.contains('open'))) i.classList.remove('selected');
+    });
+    icon.classList.add('selected');
+    var p = e.touches ? e.touches[0] : e;
+    var sx = p.clientX, sy = p.clientY;
+    var x0 = parseInt(icon.style.left, 10) || 0;
+    var y0 = parseInt(icon.style.top, 10) || 0;
+    var moved = false;
+    function move(ev){
+      var q = ev.touches ? ev.touches[0] : ev;
+      var dx = q.clientX - sx, dy = q.clientY - sy;
+      if (!moved && Math.abs(dx) < 4 && Math.abs(dy) < 4) return;
+      moved = true;
+      iconsMoved = true;
+      var x = Math.max(0, Math.min(x0 + dx, desktop.clientWidth - icon.offsetWidth));
+      var y = Math.max(0, Math.min(y0 + dy, desktop.clientHeight - icon.offsetHeight));
+      icon.style.left = x + 'px';
+      icon.style.top = y + 'px';
+      if (ev.cancelable) ev.preventDefault();
+    }
+    function up(){
+      document.removeEventListener('mousemove', move);
+      document.removeEventListener('mouseup', up);
+      document.removeEventListener('touchmove', move);
+      document.removeEventListener('touchend', up);
+    }
+    document.addEventListener('mousemove', move);
+    document.addEventListener('mouseup', up);
+    document.addEventListener('touchmove', move, { passive: false });
+    document.addEventListener('touchend', up);
+  }
+  icon.addEventListener('mousedown', start);
+  icon.addEventListener('touchstart', start, { passive: true });
+}
+dicons.forEach(makeIconDraggable);
+
+/* ---------- desktop click: deactivate everything ---------- */
+desktop.addEventListener('mousedown', function(e){
+  if (e.target === desktop || e.target.id === 'icons'){
+    setActive(null);
+    deselectIcons();
+    document.querySelectorAll('.dicon.selected').forEach(function(i){ i.classList.remove('selected'); });
+  }
+});
+
+/* ---------- menus ---------- */
+var menus = Array.prototype.slice.call(document.querySelectorAll('.menu'));
+function closeMenus(){ menus.forEach(function(m){ m.classList.remove('openm'); }); }
+menus.forEach(function(menu){
+  var t = menu.querySelector('.mtitle');
+  t.addEventListener('mousedown', function(e){
+    e.stopPropagation();
+    var was = menu.classList.contains('openm');
+    closeMenus();
+    if (!was) menu.classList.add('openm');
+  });
+  t.addEventListener('mouseenter', function(){
+    if (menus.some(function(m){ return m.classList.contains('openm'); })){
+      closeMenus();
+      menu.classList.add('openm');
+    }
+  });
+});
+document.addEventListener('mousedown', function(e){
+  if (!e.target.closest('.menu')) closeMenus();
+});
+var actions = {
+  about: function(){ openWin('about'); },
+  close: function(){ var id = activeId(); if (id) closeWin(id); },
+  cleanup: function(){ placeDefaults(); layoutIcons(); },
+  restart: function(){ window.location.reload(); }
+};
+document.querySelectorAll('.mitem').forEach(function(item){
+  item.addEventListener('click', function(){
+    if (item.classList.contains('disabled')) return;
+    closeMenus();
+    var a = item.dataset.action;
+    if (a && actions[a]) actions[a]();
+  });
+});
+
+/* ---------- projects: grid -> detail ---------- */
+var projWin = wins.projects.el;
+var grid = projWin.querySelector('.proj-grid');
+var detail = projWin.querySelector('.proj-detail');
+projWin.querySelectorAll('.proj-cell').forEach(function(cell){
+  cell.addEventListener('click', function(){
+    detail.querySelector('.proj-title').textContent = cell.dataset.name;
+    detail.querySelector('.proj-desc').textContent = cell.dataset.desc;
+    var link = detail.querySelector('.proj-link');
+    if (cell.dataset.url){
+      link.href = cell.dataset.url;
+      link.style.display = 'inline-block';
+    } else {
+      link.style.display = 'none';
+    }
+    grid.classList.add('hide');
+    detail.classList.add('show');
+  });
+});
+detail.querySelector('.back-link').addEventListener('click', function(){
+  detail.classList.remove('show');
+  grid.classList.remove('hide');
+});
+
+/* ---------- clock ---------- */
+var DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+function tick(){
+  var n = new Date();
+  var h = n.getHours() % 12 || 12;
+  var m = n.getMinutes();
+  var ap = n.getHours() < 12 ? 'AM' : 'PM';
+  document.getElementById('clock').textContent =
+    DAYS[n.getDay()] + ' ' + h + ':' + (m < 10 ? '0' : '') + m + ' ' + ap;
+}
+tick();
+setInterval(tick, 1000);
+
+/* ---------- boot ---------- */
+placeDefaults();
+layoutIcons();
+zTop += 1; wins.projects.el.style.zIndex = zTop;
+zTop += 1; wins.about.el.style.zIndex = zTop;
+setActive('about');
+wins.about.icon.classList.add('selected');
+wins.projects.icon.classList.add('selected');
+window.addEventListener('resize', function(){
+  clampAll();
+  /* untouched icons keep hugging the right edge; moved ones just stay visible */
+  if (iconsMoved) clampIcons(); else layoutIcons();
+});
+})();
+</script>
+</body>
+</html>
