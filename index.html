@@ -83,7 +83,7 @@ svg{shape-rendering:crispEdges;}
   align-items:center;gap:3px;cursor:default;position:relative;
   user-select:none;-webkit-user-select:none;
 }
-.dicon svg{width:32px;height:32px;display:block;}
+.dicon svg{width:40px;height:40px;display:block;}
 .dicon .dlabel{
   font-family:var(--font-body);font-size:11px;line-height:13px;
   padding:0 3px;color:#000000;background:transparent;text-align:center;
@@ -96,6 +96,27 @@ svg{shape-rendering:crispEdges;}
   padding:2px 5px;white-space:nowrap;
 }
 .dicon.trash:hover .tip{display:block;}
+
+/* ---------------- Game of Life wallpaper ---------------- */
+#life{position:absolute;inset:0;display:none;pointer-events:none;}
+body.life-on #life{display:block;}
+/* solid label plates so icon text stays readable over live cells */
+body.life-on .dicon .dlabel{background:#C0C0C0;}
+body.life-on .dicon.selected .dlabel{background:#000000;color:#FFFFFF;}
+body.life-edit #life{pointer-events:auto;cursor:crosshair;}
+.mchk{display:inline-block;width:14px;}
+#life-palette{
+  display:none;position:fixed;bottom:18px;left:50%;transform:translateX(-50%);
+  background:var(--face);border:1px solid #000000;z-index:4500;
+}
+body.life-edit #life-palette{display:block;}
+.lp-frame{
+  border-top:1px solid #FFFFFF;border-left:1px solid #FFFFFF;
+  border-bottom:1px solid var(--shadow);border-right:1px solid var(--shadow);
+  display:flex;align-items:center;gap:14px;padding:8px 12px;
+  font-family:var(--font-chrome);font-size:12px;
+  user-select:none;-webkit-user-select:none;cursor:default;
+}
 
 /* ---------------- Window chrome ---------------- */
 .window{
@@ -247,7 +268,7 @@ svg{shape-rendering:crispEdges;}
 .proj-link:hover{background:#000000;color:#FFFFFF;}
 
 /* ---------------- Resume (SimpleText) ---------------- */
-#win-resume{width:470px;height:380px;}
+#win-resume{width:470px;height:460px;}
 .st-toolbar{
   flex:0 0 auto;background:var(--face);
   border-bottom:1px solid #000000;
@@ -256,10 +277,23 @@ svg{shape-rendering:crispEdges;}
   user-select:none;-webkit-user-select:none;
 }
 .st-toolbar .btn{padding:2px 8px;}
-.resume-text{padding:14px;white-space:pre-wrap;font-size:12px;}
+.resume-text{padding:16px 18px 24px;font-size:12px;}
+.rz-name{font-family:var(--font-chrome);font-size:14px;font-weight:bold;text-align:center;letter-spacing:1px;}
+.rz-sec{
+  font-family:var(--font-chrome);font-size:12px;font-weight:bold;letter-spacing:1px;
+  margin-top:20px;padding-bottom:3px;border-bottom:1px solid #000000;
+}
+.rz-job{margin-top:12px;}
+.rz-row{display:flex;justify-content:space-between;gap:12px;}
+.rz-org{font-weight:bold;}
+.rz-role{font-style:italic;}
+.rz-loc,.rz-date{flex:0 0 auto;white-space:nowrap;font-size:11px;}
+.rz-list{margin:4px 0 0;padding-left:16px;list-style:square;}
+.rz-list li{margin:3px 0;font-size:11px;}
+.rz-line{margin-top:10px;font-size:11px;}
 
 /* ---------------- Contact (dialog) ---------------- */
-#win-contact{width:430px;height:190px;}
+#win-contact{width:520px;height:190px;}
 #win-contact .win-body{padding:14px;overflow:hidden;}
 .contact-row{display:flex;gap:12px;align-items:flex-start;}
 .contact-row svg{width:32px;height:32px;flex:0 0 32px;}
@@ -299,6 +333,7 @@ body.win-dragging iframe{pointer-events:none;}
     width:auto !important;right:8px;
   }
   .menu,#appname,#mb-right{display:none;}
+  #life,#life-palette{display:none !important;}
   #mobile-msg{display:flex;}
   .grow{display:none !important;}
   .rs{display:none !important;}
@@ -549,6 +584,12 @@ body.win-dragging iframe{pointer-events:none;}
       <div class="mitem" data-action="cleanup">Clean Up Desktop</div>
       <div class="mitem disabled">Empty Trash&hellip;</div>
       <div class="msep"></div>
+      <div class="mitem" data-bg="blank"><span class="mchk"></span>Blank Wallpaper</div>
+      <div class="mitem" data-bg="gun"><span class="mchk"></span>Game of Life: Glider Guns</div>
+      <div class="mitem" data-bg="rpent"><span class="mchk"></span>Game of Life: R-pentomino</div>
+      <div class="mitem" data-bg="soup"><span class="mchk"></span>Game of Life: Random Soup</div>
+      <div class="mitem" data-bg="edit"><span class="mchk"></span>Game of Life: Draw Your Own&hellip;</div>
+      <div class="msep"></div>
       <div class="mitem" data-action="restart">Restart</div>
       <div class="mitem disabled">Shut Down</div>
     </div>
@@ -576,6 +617,8 @@ body.win-dragging iframe{pointer-events:none;}
 
 <!-- ================= DESKTOP ================= -->
 <div id="desktop">
+
+  <canvas id="life"></canvas>
 
   <div id="icons">
     <div class="dicon" id="dicon-about" data-win="about">
@@ -709,7 +752,78 @@ body.win-dragging iframe{pointer-events:none;}
         <span class="btn" aria-disabled="true">Size &#9662;</span>
       </div>
       <div class="win-body">
-        <div class="resume-text">[RESUME CONTENT]</div>
+        <div class="resume-text">
+          <div class="rz-name">Cooper E. Stillick</div>
+
+          <div class="rz-sec">EDUCATION</div>
+          <div class="rz-job">
+            <div class="rz-row"><span class="rz-org">College of William &amp; Mary</span><span class="rz-loc">Williamsburg, VA</span></div>
+            <div class="rz-row"><span class="rz-role">B.A. in Economics and Government</span><span class="rz-date">Expected May 2028</span></div>
+          </div>
+
+          <div class="rz-sec">PROFESSIONAL EXPERIENCE</div>
+          <div class="rz-job">
+            <div class="rz-row"><span class="rz-org">Corridor</span></div>
+            <div class="rz-row"><span class="rz-role">Co-Founder</span><span class="rz-date">Apr. 2026 &ndash; Present</span></div>
+            <ul class="rz-list">
+              <li>Co-founded agent-native metering, pricing, and policy infrastructure for APIs. Corridor attributes every metered event to an AI agent identity &mdash; scoped, budgeted, rate-limited, and audited independently &mdash; authorizes and reserves capacity before each call lands, applies a pricing DSL per event, and settles to whatever payment rail the provider configures (Stripe Connect, x402, or invoice/ACH).</li>
+            </ul>
+          </div>
+          <div class="rz-job">
+            <div class="rz-row"><span class="rz-org">Greater Oklahoma City Chamber of Commerce</span><span class="rz-loc">Oklahoma City, OK</span></div>
+            <div class="rz-row"><span class="rz-role">Government Relations Intern</span><span class="rz-date">June 2026 &ndash; Present</span></div>
+            <ul class="rz-list">
+              <li>Researched the Chamber&rsquo;s priority policy initiatives, producing legislative summaries and briefings to support the Government Relations team&rsquo;s advocacy and strategic planning.</li>
+              <li>Engaged business owners, executives, nonprofit leaders, and civic stakeholders through Chamber events and roundtables to gather community input and advance institutional relationships.</li>
+              <li>Profiled state legislators through voting records, committee assignments, and campaign finance research to support targeted legislative outreach and engagement strategy.</li>
+              <li>Analyzed education legislation, school funding models, and workforce development initiatives, producing policy briefs that aligned education reform priorities with business community needs.</li>
+              <li>Supported the Criminal Justice Advisory Committee (CJAC) by tracking relevant legislation and preparing issue summaries and policy briefs to advance the committee&rsquo;s advocacy positions.</li>
+            </ul>
+          </div>
+          <div class="rz-job">
+            <div class="rz-row"><span class="rz-org">Nick Coffey for Attorney General</span><span class="rz-loc">Oklahoma City, OK</span></div>
+            <div class="rz-row"><span class="rz-role">Policy and Campaign Finance Fellow</span><span class="rz-date">Mar. 2026 &ndash; Present</span></div>
+            <ul class="rz-list">
+              <li>Prepared and verified candidate policy briefings and public-facing communications, ensuring accuracy and legal precision across legislative and judicial topics.</li>
+              <li>Drafted candidate responses to constituent correspondence and endorsement questionnaires, aligning messaging with the candidate&rsquo;s platform and target voter audiences.</li>
+              <li>Researched and authored video scripts on Oklahoma government corruption cases, translating political misconduct into accessible, voter-facing narratives.</li>
+              <li>Authored donor biographies for campaign prospect files, profiling contributors based on professional background, civic affiliations, and public records.</li>
+              <li>Compiled and organized campaign finance records, including contributions, expenditures, and cash on hand, to support donor outreach and prospect research.</li>
+            </ul>
+          </div>
+          <div class="rz-job">
+            <div class="rz-row"><span class="rz-org">The Verge OKC</span><span class="rz-loc">Oklahoma City, OK</span></div>
+            <div class="rz-row"><span class="rz-role">Business Operations Intern</span><span class="rz-date">June 2025 &ndash; Aug. 2025</span></div>
+            <ul class="rz-list">
+              <li>Supported operational workflows for OKC&rsquo;s leading entrepreneurial hub, coordinating coworking logistics, member onboarding, and community events.</li>
+              <li>Collaborated with leadership on efficiency projects including CRM cleanup, member database updates, and process documentation.</li>
+              <li>Assisted in planning and executing pitch nights, networking mixers, and startup education workshops.</li>
+              <li>Coordinated with members and partners on tours, bookings, and resource allocation to ensure smooth daily operations.</li>
+            </ul>
+          </div>
+          <div class="rz-job">
+            <div class="rz-row"><span class="rz-org">The United States Senate</span><span class="rz-loc">Washington, DC</span></div>
+            <div class="rz-row"><span class="rz-role">Senate Page</span><span class="rz-date">Sept. 2022 &ndash; Jan. 2023</span></div>
+            <ul class="rz-list">
+              <li>Delivered correspondence and legislative material throughout the Congressional complex.</li>
+              <li>Prepared the chamber for Senate sessions and carried bills and amendments to the desk.</li>
+            </ul>
+          </div>
+          <div class="rz-job">
+            <div class="rz-row"><span class="rz-org">The Economic Review at William and Mary</span><span class="rz-loc">Williamsburg, VA</span></div>
+            <div class="rz-row"><span class="rz-role">Editor-in-Chief</span><span class="rz-date">Nov. 2025 &ndash; Present</span></div>
+            <ul class="rz-list">
+              <li>Set editorial vision and standards, selecting publishable research and ensuring academic and ethical alignment.</li>
+              <li>Managed the full editorial workflow &mdash; submissions, peer review, revisions, and final approvals &mdash; ensuring timely, high-quality publication.</li>
+              <li>Led and trained the editorial team, assigning responsibilities and enforcing consistent style, clarity, and analytical rigor.</li>
+              <li>Expanded the journal&rsquo;s reach by recruiting contributors, coordinating with faculty, and promoting research-focused events.</li>
+            </ul>
+            <div class="rz-row" style="margin-top:6px;"><span class="rz-role">Co-founder and Managing Editor</span><span class="rz-date">Aug. 2024 &ndash; Nov. 2025</span></div>
+          </div>
+
+          <div class="rz-sec">EXTRACURRICULARS</div>
+          <div class="rz-line">W&amp;M Debate Society &middot; Mason Investment Club &middot; Economics Club &middot; Jefferson Pre-law Society &middot; AI Club</div>
+        </div>
       </div>
       <div class="grow">
         <svg width="13" height="13" viewBox="0 0 13 13">
@@ -756,6 +870,16 @@ body.win-dragging iframe{pointer-events:none;}
     </div>
   </div>
 
+  <!-- ===== Game of Life edit palette ===== -->
+  <div id="life-palette">
+    <div class="lp-frame">
+      <span>Click and drag on the desktop to draw cells</span>
+      <span class="btn" id="lp-clear">Clear</span>
+      <span class="btn" id="lp-random">Random</span>
+      <span class="dring"><span class="btn btn-default" id="lp-run">Run &#8629;</span></span>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -781,7 +905,7 @@ var MIN = {
   about:     { w: 280, h: 160 },
   projects:  { w: 340, h: 240 },
   resume:    { w: 300, h: 220 },
-  contact:   { w: 360, h: 190 },
+  contact:   { w: 520, h: 190 },
   solitaire: { w: 581, h: 595 }
 };
 
@@ -1147,6 +1271,187 @@ desktop.addEventListener('mousedown', function(e){
   }
 });
 
+/* ---------- Game of Life wallpaper ---------- */
+var life = (function(){
+  var CELL = 8;
+  var TICK = reduced ? 500 : 110;
+  var canvas = document.getElementById('life');
+  var ctx = canvas.getContext('2d');
+  var cols = 0, rows = 0;
+  var grid = new Uint8Array(0), next = new Uint8Array(0), age = new Uint8Array(0);
+  var timer = null, mode = 'blank', editing = false;
+  var painting = false, paintVal = 1;
+
+  /* Gosper glider gun — fires gliders toward the lower right */
+  var GUN = [
+    [24,0],[22,1],[24,1],[12,2],[13,2],[20,2],[21,2],[34,2],[35,2],
+    [11,3],[15,3],[20,3],[21,3],[34,3],[35,3],
+    [0,4],[1,4],[10,4],[16,4],[20,4],[21,4],
+    [0,5],[1,5],[10,5],[14,5],[16,5],[17,5],[22,5],[24,5],
+    [10,6],[16,6],[24,6],[11,7],[15,7],[12,8],[13,8]
+  ];
+  var RPENT = [[1,0],[2,0],[0,1],[1,1],[1,2]];
+
+  function resize(){
+    var w = desktop.clientWidth, h = desktop.clientHeight;
+    var c = Math.max(1, Math.floor(w / CELL));
+    var r = Math.max(1, Math.floor(h / CELL));
+    if (c === cols && r === rows && canvas.width === w && canvas.height === h) return;
+    var og = grid, oa = age, oc = cols, orw = rows;
+    canvas.width = w; canvas.height = h;
+    cols = c; rows = r;
+    grid = new Uint8Array(cols * rows);
+    next = new Uint8Array(cols * rows);
+    age  = new Uint8Array(cols * rows);
+    var ymax = Math.min(rows, orw), xmax = Math.min(cols, oc);
+    for (var y = 0; y < ymax; y++){
+      for (var x = 0; x < xmax; x++){
+        grid[y * cols + x] = og[y * oc + x];
+        age[y * cols + x]  = oa[y * oc + x];
+      }
+    }
+    draw();
+  }
+
+  function draw(){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (var y = 0; y < rows; y++){
+      for (var x = 0; x < cols; x++){
+        var i = y * cols + x;
+        if (!grid[i]) continue;
+        var a = age[i];
+        ctx.fillStyle = a >= 5 ? '#000000' : (a >= 2 ? '#000044' : '#0000AA');
+        ctx.fillRect(x * CELL, y * CELL, CELL - 1, CELL - 1);
+      }
+    }
+  }
+
+  /* one generation, toroidal edges so gliders wrap around */
+  function step(){
+    var x, y, i, n;
+    for (y = 0; y < rows; y++){
+      var ym = (y === 0 ? rows - 1 : y - 1) * cols;
+      var yp = (y === rows - 1 ? 0 : y + 1) * cols;
+      var y0 = y * cols;
+      for (x = 0; x < cols; x++){
+        var xm = x === 0 ? cols - 1 : x - 1;
+        var xp = x === cols - 1 ? 0 : x + 1;
+        n = grid[ym+xm] + grid[ym+x] + grid[ym+xp]
+          + grid[y0+xm] + grid[y0+xp]
+          + grid[yp+xm] + grid[yp+x] + grid[yp+xp];
+        i = y0 + x;
+        next[i] = grid[i] ? (n === 2 || n === 3 ? 1 : 0) : (n === 3 ? 1 : 0);
+      }
+    }
+    var t = grid; grid = next; next = t;
+    for (i = 0; i < grid.length; i++) age[i] = grid[i] ? Math.min(age[i] + 1, 255) : 0;
+    draw();
+  }
+
+  function start(){ stop(); timer = setInterval(step, TICK); }
+  function stop(){ if (timer){ clearInterval(timer); timer = null; } }
+
+  function stamp(cells, ox, oy, flip){
+    cells.forEach(function(c){
+      var x = flip ? ox - c[0] : ox + c[0];
+      var y = flip ? oy - c[1] : oy + c[1];
+      if (x >= 0 && y >= 0 && x < cols && y < rows){
+        grid[y * cols + x] = 1; age[y * cols + x] = 1;
+      }
+    });
+  }
+
+  function seed(name){
+    grid.fill(0); age.fill(0);
+    if (name === 'gun'){
+      stamp(GUN, 4, 4, false);
+      /* second gun in the far corner firing back — gliders collide mid-desktop */
+      if (cols >= 90 && rows >= 50) stamp(GUN, cols - 5, rows - 5, true);
+    } else if (name === 'rpent'){
+      stamp(RPENT, (cols >> 1) - 1, (rows >> 1) - 1, false);
+    } else if (name === 'soup'){
+      for (var i = 0; i < grid.length; i++){
+        if (Math.random() < 0.15){ grid[i] = 1; age[i] = 1; }
+      }
+    }
+  }
+
+  function stopEdit(){
+    editing = false; painting = false;
+    document.body.classList.remove('life-edit');
+  }
+  function finishEdit(){ stopEdit(); start(); checks(); }
+
+  function checks(){
+    document.querySelectorAll('.mitem[data-bg]').forEach(function(it){
+      var k = it.dataset.bg;
+      var on = k === mode || (k === 'edit' && mode === 'custom');
+      it.querySelector('.mchk').textContent = on ? '✓' : '';
+    });
+  }
+
+  function set(name){
+    stopEdit();
+    if (name === 'blank'){
+      stop(); mode = 'blank';
+      document.body.classList.remove('life-on');
+      grid.fill(0); age.fill(0); draw();
+    } else if (name === 'edit'){
+      stop(); mode = 'custom'; editing = true;
+      document.body.classList.add('life-on');
+      document.body.classList.add('life-edit');
+      draw();
+    } else {
+      mode = name;
+      document.body.classList.add('life-on');
+      seed(name); draw(); start();
+    }
+    checks();
+  }
+
+  /* drawing cells in edit mode */
+  function cellIndex(e){
+    var r = canvas.getBoundingClientRect();
+    var x = Math.floor((e.clientX - r.left) / CELL);
+    var y = Math.floor((e.clientY - r.top) / CELL);
+    if (x < 0 || y < 0 || x >= cols || y >= rows) return -1;
+    return y * cols + x;
+  }
+  canvas.addEventListener('mousedown', function(e){
+    if (!editing || e.button !== 0) return;
+    e.preventDefault();
+    var i = cellIndex(e);
+    if (i < 0) return;
+    paintVal = grid[i] ? 0 : 1;
+    painting = true;
+    grid[i] = paintVal; age[i] = paintVal; draw();
+  });
+  document.addEventListener('mousemove', function(e){
+    if (!painting) return;
+    var i = cellIndex(e);
+    if (i >= 0 && grid[i] !== paintVal){
+      grid[i] = paintVal; age[i] = paintVal; draw();
+    }
+  });
+  document.addEventListener('mouseup', function(){ painting = false; });
+
+  document.getElementById('lp-clear').addEventListener('click', function(){
+    grid.fill(0); age.fill(0); draw();
+  });
+  document.getElementById('lp-random').addEventListener('click', function(){
+    seed('soup'); draw();
+  });
+  document.getElementById('lp-run').addEventListener('click', function(){
+    if (editing) finishEdit();
+  });
+  document.addEventListener('keydown', function(e){
+    if (editing && e.key === 'Enter') finishEdit();
+  });
+
+  resize();
+  return { set: set, resize: resize };
+})();
+
 /* ---------- menus ---------- */
 var menus = Array.prototype.slice.call(document.querySelectorAll('.menu'));
 function closeMenus(){ menus.forEach(function(m){ m.classList.remove('openm'); }); }
@@ -1180,6 +1485,7 @@ document.querySelectorAll('.mitem').forEach(function(item){
     closeMenus();
     var a = item.dataset.action;
     if (a && actions[a]) actions[a]();
+    if (item.dataset.bg) life.set(item.dataset.bg);
   });
 });
 
@@ -1228,8 +1534,10 @@ zTop += 1; wins.about.el.style.zIndex = zTop;
 setActive('about');
 wins.about.icon.classList.add('selected');
 wins.projects.icon.classList.add('selected');
+life.set((reduced || window.innerWidth < 768) ? 'blank' : 'gun');
 window.addEventListener('resize', function(){
   clampAll();
+  life.resize();
   /* untouched icons keep hugging the right edge; moved ones just stay visible */
   if (iconsMoved) clampIcons(); else layoutIcons();
 });

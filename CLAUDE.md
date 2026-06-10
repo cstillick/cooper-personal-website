@@ -57,8 +57,26 @@ icons, working menu bar, and a playable Solitaire app.
   Trash has a CSS hover tooltip "Trash (0 items)".
 - **Menu bar**: Apple/File/Edit/View/Special/Help. Working actions: Get Info / About This
   Website (opens About), Close Window, Clean Up Desktop (resets window positions/sizes and
-  icon layout), Restart (reload).
+  icon layout — does NOT touch the wallpaper), wallpaper switching (Special, below),
+  Restart (reload).
   `#appname` shows active window's `data-app` ("Finder" / "SimpleText" / "Solitaire").
+- **Game of Life wallpaper**: `<canvas id="life">` is the first child of `#desktop` — behind
+  icons and windows, `pointer-events:none` except in edit mode, so desktop clicks still pass
+  through to the deselect handler. All logic lives in the `life` IIFE module (exposes
+  `set(name)` / `resize()`). Special-menu items carry `data-bg` =
+  `blank | gun | rpent | soup | edit`; each has a `.mchk` span and `checks()` puts the ✓ on
+  the active one (mode `custom` checks "Draw Your Own"). Boot default is `gun` — Gosper
+  glider gun top-left plus a 180°-flipped gun bottom-right (second gun only if grid ≥ 90×50
+  cells) so the glider streams collide; default falls back to `blank` under
+  `prefers-reduced-motion` or <768px. Engine: 8px cells drawn 7×7 (1px gap), Uint8Array
+  double buffer, toroidal wrap, 110ms tick (500ms under reduced motion). Cells darken with
+  age: `#0000AA` → `#000044` (age ≥2) → `#000000` (age ≥5) — flat colors from the sanctioned
+  palette. "Draw Your Own…" pauses the sim and sets `body.life-edit` (canvas gets pointer
+  events + crosshair; first cell clicked decides paint vs erase for the drag) and shows
+  `#life-palette` (Clear / Random / default Run ↵ button; Enter also runs). `body.life-on`
+  gives icon labels solid `#C0C0C0` backplates so they stay legible over cells (selected
+  labels stay inverted). Viewport resize preserves overlapping cells; re-picking Random
+  Soup re-randomizes.
 - **Contact** is a fixed centered dialog (class `no-drag`), pulsing default button.
 - **Mobile (<768px)**: everything hidden except the About window; menu bar shows
   "Mac OS requires a larger display" + pixel Mac icon.
