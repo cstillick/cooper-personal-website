@@ -65,7 +65,6 @@ svg{shape-rendering:crispEdges;}
 #appname{font-weight:bold;padding:0 10px;display:flex;align-items:center;}
 #mb-right{margin-left:auto;display:flex;align-items:center;gap:10px;padding:0 12px;}
 #clock{white-space:nowrap;}
-#mobile-msg{display:none;align-items:center;padding:0 8px;white-space:nowrap;}
 .micon{width:16px;height:16px;display:block;}
 .ticon{width:14px;height:14px;vertical-align:-2px;}
 .bicon{width:13px;height:13px;vertical-align:-2px;}
@@ -349,21 +348,52 @@ body.win-dragging iframe{pointer-events:none;}
   .zoomrect{transition:none;}
 }
 
-/* ---------------- Mobile ---------------- */
+/* ---------------- Mobile (<768px) ----------------
+   The desktop becomes a scrolling page: decorative icon strip up top
+   (tap jumps to that window), then About / Projects / Resume / Contact
+   stacked as static full-width windows. Solitaire needs a mouse, so its
+   window and icon are hidden. Desktop (>=768px) is untouched. */
 @media (max-width:767px){
-  #boot{display:none !important;}
-  #icons{display:none;}
-  .window{display:none !important;}
-  #win-about{
-    display:block !important;
-    left:8px !important;top:40px !important;
-    width:auto !important;right:8px;
-  }
-  .menu,#appname,#mb-right{display:none;}
+  html,body{height:auto;}
+  body{overflow:auto;overflow-x:hidden;-webkit-text-size-adjust:100%;}
+  /* boot still plays, just typeset for a phone */
+  #boot-title{font-size:12px;}
+  .boot-inner{padding:16px 12px 14px;}
+  #boot-bar{width:180px;}
+  #boot-exts{gap:8px;}
+  /* menu bar: Apple logo, "Finder", battery + clock stay; dropdowns are mouse furniture */
+  .menu{display:none;}
+  #menu-apple{display:flex;pointer-events:none;}
+  /* desktop scrolls under the fixed menu bar */
+  #desktop{position:static;overflow:visible;margin-top:22px;padding:14px 10px 28px;min-height:calc(100vh - 22px);}
   #life,#life-palette{display:none !important;}
-  #mobile-msg{display:flex;}
+  /* icon strip: static flex row, drag disabled in JS, labels never inverted */
+  #icons,#icons.free{position:static;width:auto;display:flex;flex-direction:row;flex-wrap:wrap;justify-content:center;gap:14px 4px;margin-bottom:16px;}
+  #icons.free .dicon{position:static;}
+  .dicon{width:70px;}
+  .dicon .dlabel,.dicon.selected .dlabel{background:transparent;color:#000000;}
+  #dicon-solitaire{display:none;}
+  #dicon-trash .tip{display:none;}
+  /* every window: static card, always dressed as active */
+  .window{
+    display:block !important;position:static !important;
+    width:auto !important;height:auto !important;
+    max-width:520px;margin:0 auto 18px;scroll-margin-top:30px;
+  }
+  #win-solitaire{display:none !important;}
+  .titlebar{
+    background:repeating-linear-gradient(to bottom,
+      var(--titlebar) 0px,var(--titlebar) 1px,
+      #000000 1px,#000000 2px);
+  }
+  .title span{background:#000000;color:#FFFFFF;padding:1px 7px;}
+  .tbox{display:none;}
+  .win-body{overflow:visible;}
   .grow{display:none !important;}
   .rs{display:none !important;}
+  .proj-grid{grid-template-columns:repeat(3,1fr);}
+  .rz-row{flex-wrap:wrap;}
+  .contact-btns{justify-content:center;}
 }
 </style>
 </head>
@@ -661,7 +691,6 @@ body.win-dragging iframe{pointer-events:none;}
       <div class="mitem disabled">Show Balloons</div>
     </div>
   </div>
-  <div id="mobile-msg">Mac OS requires a larger display&nbsp;<svg class="micon" viewBox="0 0 16 16"><use href="#icon-mac"/></svg></div>
   <div id="mb-right">
     <svg id="battery" width="20" height="12" viewBox="0 0 20 12" aria-hidden="true">
       <rect x="0" y="2" width="18" height="8" fill="#000000"/>
@@ -946,6 +975,9 @@ body.win-dragging iframe{pointer-events:none;}
 (function(){
 'use strict';
 var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+/* mobile = static stacked-window layout; drag/resize/free-icon code must stand down */
+var mqMobile = window.matchMedia('(max-width: 767px)');
+function isMobile(){ return mqMobile.matches; }
 var MB = 22;            // menu bar height
 var zTop = 30;
 var appname = document.getElementById('appname');
@@ -1094,6 +1126,7 @@ function makeDraggable(id){
   var el = wins[id].el;
   var bar = el.querySelector('.titlebar');
   function start(e){
+    if (isMobile()) return; /* windows are static cards; let the page scroll */
     if (e.target.closest('.tbox')) return;
     if (el.classList.contains('no-drag')) return;
     document.body.classList.add('win-dragging');
@@ -1237,6 +1270,12 @@ function deselectIcons(){
 document.querySelectorAll('.dicon').forEach(function(icon){
   icon.addEventListener('click', function(e){
     e.stopPropagation();
+    /* mobile: the strip is a table of contents — jump to that window */
+    if (isMobile()){
+      var winId = icon.dataset.win;
+      if (winId && wins[winId] && winId !== 'solitaire') wins[winId].el.scrollIntoView();
+      return;
+    }
     document.querySelectorAll('.dicon.selected').forEach(function(i){
       var winId = i.dataset.win;
       if (i !== icon && (!winId || !wins[winId].el.classList.contains('open'))) i.classList.remove('selected');
@@ -1282,6 +1321,7 @@ function clampIcons(){
 }
 function makeIconDraggable(icon){
   function start(e){
+    if (isMobile()) return; /* icons are a static strip; let the page scroll */
     if (e.type === 'mousedown' && e.button !== 0) return;
     /* select on mousedown, like the real Finder */
     dicons.forEach(function(i){
@@ -1602,9 +1642,9 @@ wins.projects.icon.classList.add('selected');
 (function(){
   var bootEl = document.getElementById('boot');
   function startWallpaper(){
-    life.set((reduced || window.innerWidth < 768) ? 'blank' : 'gun');
+    life.set((reduced || isMobile()) ? 'blank' : 'gun');
   }
-  if (reduced || window.innerWidth < 768){
+  if (reduced){
     bootEl.remove();
     startWallpaper();
     return;
@@ -1633,6 +1673,7 @@ wins.projects.icon.classList.add('selected');
     startWallpaper();
   }
   bootEl.addEventListener('mousedown', finish);
+  bootEl.addEventListener('touchstart', finish, { passive: true });
   document.addEventListener('keydown', finish);
 
   at(900, function(){ bootEl.classList.add('welcome'); });
