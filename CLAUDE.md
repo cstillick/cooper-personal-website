@@ -44,9 +44,10 @@ icons, working menu bar, and a playable Solitaire app.
 - **Boot sequence**: `#boot` overlay (z 10000, desktop gray) plays on every load — ~0.9s
   Happy Mac (`#icon-happymac`, 32×32 symbol) → "Welcome to Macintosh." box (double black
   pinstripe frame) with status text + chunky stepped progress bar (`#0000AA` fill, no easing)
-  while 7 "extension" icons march in bottom-left (reuses existing symbols). Any mousedown or
-  keydown skips. Skipped entirely (overlay removed immediately) under `prefers-reduced-motion`
-  or <768px. The wallpaper `life.set(...)` call lives inside the boot module's
+  while 7 "extension" icons march in bottom-left (reuses existing symbols). Any mousedown,
+  touchstart, or keydown skips. Skipped entirely (overlay removed immediately) under
+  `prefers-reduced-motion`; on <768px it still plays, typeset smaller (12px title, 180px bar).
+  The wallpaper `life.set(...)` call lives inside the boot module's
   `startWallpaper()` — it only runs when boot ends, so glider guns fire from a fresh desktop.
   Special→Restart reloads the page, which replays the boot (intentional).
 - **Window system**: windows registered in `wins` (id → `{el, icon}`) from the array
@@ -86,8 +87,18 @@ icons, working menu bar, and a playable Solitaire app.
   labels stay inverted). Viewport resize preserves overlapping cells; re-picking Random
   Soup re-randomizes.
 - **Contact** is a fixed centered dialog (class `no-drag`), pulsing default button.
-- **Mobile (<768px)**: everything hidden except the About window; menu bar shows
-  "Mac OS requires a larger display" + pixel Mac icon.
+- **Mobile (<768px)**: the desktop becomes a scrolling page (body `overflow:auto`,
+  `#desktop` static). A static icon strip sits up top — tapping an icon `scrollIntoView`s
+  its window (`scroll-margin-top` clears the fixed menu bar); the Solitaire icon and window
+  are hidden (the game needs a mouse). About / Projects / Resume / Contact stack as static
+  full-width cards (`position:static !important`, `height:auto`, max-width 520px) all
+  dressed as active (pinstripe titlebars, inverted titles), with close/zoom boxes, grow
+  box, and resize handles hidden. Menu bar keeps the Apple logo (decorative,
+  `pointer-events:none`), "Finder", battery, and clock; dropdown menus are hidden.
+  Life wallpaper stays off. JS guard: `isMobile()` (`matchMedia(max-width:767px)`, checked
+  live at event time) makes window-drag and icon-drag handlers stand down so touch
+  scrolling isn't hijacked, and reroutes icon clicks to the scroll-to behavior.
+  Rotating past 768px restores the full desktop (drags re-enable automatically).
 
 ## Solitaire integration (the in-page app)
 
