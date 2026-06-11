@@ -11,6 +11,8 @@ icons, working menu bar, and a playable Solitaire app.
   (Press Start 2P).
 - `solitaire.html` — fully playable Klondike Solitaire, same visual system. Standalone page
   AND embedded app (see Architecture). Same single-file, no-dependency constraints.
+- `avatar.jpg` — 320×320 cropped headshot of Cooper, shown as the circular avatar in the
+  About window's info-head (the desktop About icon stays the pixel-art silhouette).
 - Both files keep all CSS in one `<style>` and all JS in one `<script>` (IIFE, `'use strict'`,
   ES5-style `var` functions).
 
@@ -18,7 +20,8 @@ icons, working menu bar, and a playable Solitaire app.
 
 1. **No `box-shadow` anywhere.** Depth comes from flat 1px color borders only
    (highlight `#FFFFFF` top/left, shadow `#888888` bottom/right, outer `#000000`).
-2. **No `border-radius`** except the one default-button outer ring (`.dring`, 8px).
+2. **No `border-radius`** except the one default-button outer ring (`.dring`, 8px) and the
+   circular photo avatar in the About window (`.info-head .avatar`, 50% — user-requested).
 3. **No gradients** except 1px/2px hard-stop `repeating-linear-gradient` used as pattern
    fills (titlebar pinstripes, Solitaire card-back checkerboard). Nothing soft, ever.
 4. **Pixel art only**: every icon is an inline SVG `<symbol>` on a strict integer grid

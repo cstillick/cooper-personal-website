@@ -14,7 +14,8 @@
 /* ============================================================
    SYSTEM 7 / PLATINUM — flat color borders only.
    No box-shadow. No gradients (except 1px-step pinstripe).
-   No border-radius except the default button's outer ring.
+   No border-radius except the default button's outer ring
+   and the circular About-window photo avatar.
    ============================================================ */
 :root{
   --desktop:#C0C0C0;
@@ -236,6 +237,7 @@ body.life-edit #life-palette{display:block;}
 #win-about .win-body{padding:12px;}
 .info-head{display:flex;gap:12px;align-items:flex-start;margin-bottom:10px;}
 .info-head svg{width:32px;height:32px;flex:0 0 32px;}
+.info-head .avatar{width:64px;height:64px;flex:0 0 64px;border-radius:50%;border:1px solid #000000;}
 .info-name{font-family:var(--font-chrome);font-size:12px;font-weight:bold;padding-top:2px;}
 .info-bio{margin-top:4px;font-size:11px;}
 .info-rule{border-top:1px solid #888888;margin:8px 0;}
@@ -748,7 +750,7 @@ body.win-dragging iframe{pointer-events:none;}
       <div class="win-body">
         <div style="padding:12px;">
           <div class="info-head">
-            <svg viewBox="0 0 32 32"><use href="#icon-about"/></svg>
+            <img class="avatar" src="avatar.jpg" alt="Cooper Stillick" width="64" height="64" draggable="false">
             <div>
               <div class="info-name">Cooper Stillick</div>
               <div class="info-bio">I find problems and fix them</div>
