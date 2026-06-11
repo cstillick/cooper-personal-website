@@ -62,16 +62,82 @@ icons, working menu bar, and a playable Solitaire app.
   `makeResizable` (8 invisible `.rs-*` handle divs appended to every window — edges + corners,
   per-window minimums in the `MIN` map), `toggleZoom` (zoom box toggles current size ↔ ~85%
   of viewport, restore rect stashed in `dataset.prevRect`; manual resize clears it).
-- **Icons**: single-click/mousedown selects (inverted label), double-click opens, drag to
-  rearrange (4px threshold so clicks don't move them). `layoutIcons()` measures the flex
-  column then switches `#icons` to absolute "free" mode; untouched icons re-anchor to the
-  right edge on viewport resize (`iconsMoved` flag). Icons of open windows stay selected.
-  Trash has a CSS hover tooltip "Trash (0 items)".
+- **Icons**: single-click/mousedown selects (inverted label), shift-click adds/removes from
+  the selection, double-click opens, drag to rearrange (4px threshold so clicks don't move
+  them). **Group drag**: dragging an already-selected icon moves every selected icon as one
+  rigid unit — the (dx,dy) delta is clamped once for the whole group so relative positions
+  survive at the desktop edges; a fresh (unselected) icon drags alone. `iconDragMoved` flag
+  keeps the trailing click event from collapsing a multi-selection after a drag, and
+  `selectOnly()` is the shared "select one, drop the rest" helper. `layoutIcons()` measures
+  the flex column then switches `#icons` to absolute "free" mode; untouched icons re-anchor
+  to the right edge on viewport resize (`iconsMoved` flag). Icons of open windows stay
+  selected. Trash has a CSS hover tooltip (live item count); double-click opens the Trash
+  window. Icon events attach via `hookIconEvents` + `makeIconDraggable` so dynamic icons
+  behave like the originals.
+- **Mini file system** (`fsItems`: fid → `{type:'folder'|'txt', name, items, content, icon,
+  winId, parent}` where `parent` is `'desk' | 'trash' | folder fid` — every item lives in
+  exactly one place): File → New Folder / New Text File create items in the active folder
+  window, else on the desktop (cascading from top-left, named "untitled folder N" /
+  "untitled N.txt"). Double-clicking a folder opens a real Finder window (`openFolder` →
+  `buildWindow` + `addFinderChrome`, win id `fld<fid>`) with a classic `.fld-status` strip
+  ("N items, 42 MB available") and a flex-wrap `.ficon` grid (`.ficon`, NOT `.dicon`, so the
+  marquee/desktop logic ignores in-window icons); the body renders existing children on first
+  build, so items moved into a never-opened folder appear when it opens. Double-clicking a
+  txt opens a SimpleText editor window (id `txt<fid>`, `contenteditable="plaintext-only"` div
+  `.txt-edit`, falls back to `true`; content saved to the item on input, persists across
+  close/reopen within the session — no storage).
+  `buildWindow` clones the standard chrome markup, registers into `wins`/`MIN`, stores
+  defaults in `data-x/y/w/h` (placeDefaults restores dynamic sizes from these), and wires via
+  `wireWindow` (the extracted per-window wiring), so openWin/closeWin/zoom/drag/resize all
+  work unchanged. Windows are created lazily on first open and kept in the DOM after close.
+- **Moving items (drag & drop)**: `moveItem(fid, dest, x, y)` = `detachItem` + `placeItem`;
+  dest is `'desk' | 'trash' | folder fid`. `dropTargetAt(x, y, excludeEls)` resolves a drop
+  point: the topmost open window under it wins (Trash window → `'trash'`, `fld*` → that fid,
+  any other window → `'none'` = blocked); on bare desktop, the Trash icon and closed fs
+  folder dicons accept (dragged icons excluded so plain rearranging isn't hijacked); else
+  `'desk'`. Desktop drags route through `dropDicons` on mouseup (fs items move; system icons
+  snap back, with a "required by the system" alert if the target was the Trash; folder-into-
+  itself is blocked by `inSubtree` and snaps back). `.ficon`s drag with a dashed-outline
+  `.dragghost` div that follows the cursor (mouse only); dropping on the desktop lands the
+  icon under the cursor. `placeItem` re-points `wins[item.winId].icon` so the zoomRect
+  animation tracks the icon's current home.
+- **Trash**: `trashFids` array + `updateTrash()` (swaps the dicon between `#icon-trash` /
+  `#icon-trash-full`, refreshes tooltip + balloon text + window status). Double-click / File →
+  Open opens a real Trash Finder window (`openTrash`, win id `trash`, same `addFinderChrome`)
+  whose items can be dragged back out. Special → Empty Trash: empty → plain alert; else
+  `showConfirm` ("contains N items, which use NK…", `itemSizeK` fakes sizes: txt 4K, folder
+  1+children) then `emptyTrashNow` → recursive `destroyItem` (removes descendants' icons,
+  windows, `wins`/`MIN` entries, and `fsItems` records for real).
+- **Selection marquee**: mousedown on empty desktop deselects, then dragging ≥3px shows
+  `#marquee` (translucent `rgba(0,0,0,0.15)` fill, 1px black border, z-index 18 — above
+  icons, below windows) and live-toggles `.selected` on every icon whose rect intersects it.
+  Suppressed when Life edit mode owns the canvas (target check fails). The ONLY sanctioned
+  use of alpha translucency.
 - **Menu bar**: Apple/File/Edit/View/Special/Help. Working actions: Get Info / About This
-  Website (opens About), Close Window, Clean Up Desktop (resets window positions/sizes and
-  icon layout — does NOT touch the wallpaper), wallpaper switching (Special, below),
-  Restart (reload).
-  `#appname` shows active window's `data-app` ("Finder" / "SimpleText" / "Solitaire").
+  Website (opens About), File → New Folder / New Text File (create in the active folder
+  window, else the desktop — see mini file system above), Open (opens selected icons —
+  folders/txt items, selected in-window `.ficon`s too; Trash opens its window), Close Window
+  / Quit, Edit → Copy (text selection, else selected icon/file
+  names, via `navigator.clipboard`) and Select All (resume frontmost → selects document text;
+  otherwise selects all icons), View → by Icon/Name/Size/Date (reorders the icon column via
+  `sortIcons`; fake sizes/dates in `ICONMETA`, Trash pinned last, ✓ via `.mchk`), Special →
+  Clean Up Desktop (resets window positions/sizes and icon layout — does NOT touch the
+  wallpaper), Empty Trash (confirm + real delete — see Trash above), wallpaper switching (below),
+  Restart (reload), Shut Down (`#shutdown` black screen, "It is now safe to turn off your
+  Macintosh.", click reloads), Help → Show/Hide Balloons (`data-bln` balloon help on icons,
+  close/zoom boxes, battery, clock via one `mouseover` delegate + `#balloon` div).
+  Still disabled on purpose: Control Panels, Chooser, Undo, Cut, Paste, Clear (era-correct).
+  `#menubar` mousedown is `preventDefault`ed so menu clicks don't clear selections (Copy
+  depends on this). `#appname` shows active window's `data-app` ("Finder" / "SimpleText" /
+  "Solitaire").
+- **Alert dialog**: `#alert-box` fixed centered (z 7000), `showAlert(text, '#icon-…')` swaps
+  the 32×32 icon via `<use id="alert-icon">`; OK button or Enter dismisses, Escape cancels.
+  `showConfirm(text, icon, onOk)` adds the `confirm` class, which reveals the Cancel button
+  (only OK runs the callback). Used by Empty Trash and the system-icon Trash refusal.
+- **SimpleText toolbar** (Resume window): B and I latch (`.btn.on` pressed look) and toggle
+  `.st-bold`/`.st-italic` on `.resume-text` (descendant `*` override). Size ▾ opens a
+  `.mdrop`-styled popup (9–24 pt, ✓ on current) that sets `--stsize` on `#win-resume`;
+  every resume font-size is `calc(var(--stsize,12px) ± Npx)` so the whole document scales.
 - **Game of Life wallpaper**: `<canvas id="life">` is the first child of `#desktop` — behind
   icons and windows, `pointer-events:none` except in edit mode, so desktop clicks still pass
   through to the deselect handler. All logic lives in the `life` IIFE module (exposes

@@ -224,6 +224,12 @@ body.life-edit #life-palette{display:block;}
   border-top:1px solid var(--shadow);border-left:1px solid var(--shadow);
   border-bottom:1px solid #FFFFFF;border-right:1px solid #FFFFFF;
 }
+/* latched toggle state (SimpleText B / I) — same pressed look as :active */
+.btn.on{
+  background:#888888;color:#FFFFFF;
+  border-top:1px solid var(--shadow);border-left:1px solid var(--shadow);
+  border-bottom:1px solid #FFFFFF;border-right:1px solid #FFFFFF;
+}
 /* The ONE allowed border-radius: the default button's outer ring */
 .dring{
   display:inline-block;border:2px solid #000000;border-radius:8px;
@@ -280,20 +286,26 @@ body.life-edit #life-palette{display:block;}
   user-select:none;-webkit-user-select:none;
 }
 .st-toolbar .btn{padding:2px 8px;}
-.resume-text{padding:16px 18px 24px;font-size:12px;}
-.rz-name{font-family:var(--font-chrome);font-size:14px;font-weight:bold;text-align:center;letter-spacing:1px;}
+.st-sizewrap{position:relative;display:inline-block;}
+.st-sizes{min-width:110px;}
+.st-sizes.show{display:block;}
+/* --stsize (set on #win-resume by the Size menu) scales every text size in step */
+.resume-text{padding:16px 18px 24px;font-size:var(--stsize,12px);}
+.resume-text.st-bold,.resume-text.st-bold *{font-weight:bold;}
+.resume-text.st-italic,.resume-text.st-italic *{font-style:italic;}
+.rz-name{font-family:var(--font-chrome);font-size:calc(var(--stsize,12px) + 2px);font-weight:bold;text-align:center;letter-spacing:1px;}
 .rz-sec{
-  font-family:var(--font-chrome);font-size:12px;font-weight:bold;letter-spacing:1px;
+  font-family:var(--font-chrome);font-size:var(--stsize,12px);font-weight:bold;letter-spacing:1px;
   margin-top:20px;padding-bottom:3px;border-bottom:1px solid #000000;
 }
 .rz-job{margin-top:12px;}
 .rz-row{display:flex;justify-content:space-between;gap:12px;}
 .rz-org{font-weight:bold;}
 .rz-role{font-style:italic;}
-.rz-loc,.rz-date{flex:0 0 auto;white-space:nowrap;font-size:11px;}
+.rz-loc,.rz-date{flex:0 0 auto;white-space:nowrap;font-size:calc(var(--stsize,12px) - 1px);}
 .rz-list{margin:4px 0 0;padding-left:16px;list-style:square;}
-.rz-list li{margin:3px 0;font-size:11px;}
-.rz-line{margin-top:10px;font-size:11px;}
+.rz-list li{margin:3px 0;font-size:calc(var(--stsize,12px) - 1px);}
+.rz-line{margin-top:10px;font-size:calc(var(--stsize,12px) - 1px);}
 
 /* ---------------- Contact (dialog) ---------------- */
 #win-contact{width:520px;height:190px;}
@@ -304,6 +316,32 @@ body.life-edit #life-palette{display:block;}
 .contact-btns{
   display:flex;gap:16px;justify-content:flex-end;align-items:center;flex-wrap:wrap;
   margin-top:24px;
+}
+
+/* ---------------- Folder windows & text files ---------------- */
+.fld-status{
+  flex:0 0 auto;background:#FFFFFF;border-bottom:1px solid #000000;
+  font-family:var(--font-body);font-size:10px;padding:3px 8px;
+  user-select:none;-webkit-user-select:none;cursor:default;
+}
+.fld-body{
+  display:flex;flex-wrap:wrap;align-content:flex-start;
+  gap:14px 4px;padding:14px 8px;min-height:100%;
+}
+.ficon{
+  width:76px;display:flex;flex-direction:column;align-items:center;gap:3px;
+  cursor:default;user-select:none;-webkit-user-select:none;
+}
+.ficon svg{width:32px;height:32px;display:block;}
+.ficon .flabel{
+  font-family:var(--font-body);font-size:11px;line-height:13px;
+  padding:0 3px;text-align:center;
+}
+.ficon.selected .flabel{background:#000000;color:#FFFFFF;}
+.txt-edit{
+  min-height:100%;padding:10px 12px;outline:none;cursor:text;
+  font-family:var(--font-body);font-size:12px;line-height:1.5;
+  white-space:pre-wrap;word-break:break-word;
 }
 
 /* ---------------- Solitaire app window ---------------- */
@@ -342,6 +380,55 @@ body.win-dragging iframe{pointer-events:none;}
   position:fixed;border:1px dashed #000000;background:transparent;
   pointer-events:none;z-index:9999;
   transition:left 120ms linear,top 120ms linear,width 120ms linear,height 120ms linear;
+}
+
+/* ---------------- Desktop selection marquee ---------------- */
+#marquee{
+  position:absolute;display:none;
+  border:1px solid #000000;background:rgba(0,0,0,0.15);
+  pointer-events:none;z-index:18; /* above icons, below windows (z 30+) */
+}
+
+/* ---------------- File drag ghost (dashed outline, like the zoom rect) ---------------- */
+.dragghost{
+  position:fixed;border:1px dashed #000000;background:transparent;
+  pointer-events:none;z-index:9000;
+}
+
+/* ---------------- Alert dialog (Empty Trash, empty folders) ---------------- */
+#alert-box{
+  display:none;position:fixed;left:50%;top:36%;transform:translate(-50%,-50%);
+  width:340px;border:1px solid #000000;background:var(--chrome-bg);z-index:7000;
+}
+#alert-box.show{display:block;}
+.alert-inner{
+  border-top:1px solid #FFFFFF;border-left:1px solid #FFFFFF;
+  border-bottom:1px solid var(--shadow);border-right:1px solid var(--shadow);
+  padding:14px;
+}
+.alert-row{display:flex;gap:12px;align-items:flex-start;}
+.alert-row svg{width:32px;height:32px;flex:0 0 32px;}
+.alert-text{font-family:var(--font-chrome);font-size:12px;line-height:1.6;padding-top:2px;}
+.alert-btns{display:flex;justify-content:flex-end;align-items:center;gap:14px;margin-top:16px;}
+#alert-cancel{display:none;}
+#alert-box.confirm #alert-cancel{display:inline-block;}
+
+/* ---------------- Shut Down screen ---------------- */
+#shutdown{
+  display:none;position:fixed;inset:0;background:#000000;z-index:9500;
+  flex-direction:column;align-items:center;justify-content:center;gap:14px;
+  cursor:default;user-select:none;-webkit-user-select:none;
+}
+#shutdown.show{display:flex;}
+.sd-msg{color:#FFFFFF;font-family:var(--font-chrome);font-size:16px;text-align:center;padding:0 20px;}
+.sd-sub{color:#888888;font-family:var(--font-body);font-size:11px;}
+
+/* ---------------- Balloon help ---------------- */
+#balloon{
+  display:none;position:fixed;max-width:190px;
+  background:#FFFFFF;border:1px solid #000000;
+  font-family:var(--font-body);font-size:10px;line-height:1.5;
+  padding:4px 6px;z-index:8000;pointer-events:none;
 }
 
 /* ---------------- Reduced motion ---------------- */
@@ -607,6 +694,38 @@ body.win-dragging iframe{pointer-events:none;}
         <rect x="9" y="26" width="14" height="1"/>
       </g>
     </symbol>
+
+    <!-- full trash: lid pushed up, crumpled paper peeking out between lid and rim -->
+    <symbol id="icon-trash-full" viewBox="0 0 32 32">
+      <g fill="#000000">
+        <rect x="13" y="0" width="6" height="1"/>
+        <rect x="12" y="1" width="1" height="2"/>
+        <rect x="19" y="1" width="1" height="2"/>
+        <rect x="7" y="3" width="18" height="2"/>
+      </g>
+      <rect x="9" y="5" width="14" height="3" fill="#FFFFFF"/>
+      <g fill="#000000">
+        <rect x="9" y="5" width="1" height="3"/>
+        <rect x="22" y="5" width="1" height="3"/>
+        <rect x="11" y="6" width="2" height="1"/>
+        <rect x="15" y="5" width="1" height="2"/>
+        <rect x="18" y="6" width="2" height="1"/>
+        <rect x="13" y="7" width="1" height="1"/>
+        <rect x="20" y="7" width="1" height="1"/>
+      </g>
+      <rect x="10" y="9" width="12" height="17" fill="#FFFFFF"/>
+      <g fill="#888888">
+        <rect x="12" y="11" width="1" height="13"/>
+        <rect x="15" y="11" width="1" height="13"/>
+        <rect x="18" y="11" width="1" height="13"/>
+      </g>
+      <g fill="#000000">
+        <rect x="9" y="8" width="14" height="1"/>
+        <rect x="9" y="9" width="1" height="17"/>
+        <rect x="22" y="9" width="1" height="17"/>
+        <rect x="9" y="26" width="14" height="1"/>
+      </g>
+    </symbol>
   </defs>
 </svg>
 
@@ -639,13 +758,14 @@ body.win-dragging iframe{pointer-events:none;}
   <div class="menu">
     <div class="mtitle">File</div>
     <div class="mdrop">
-      <div class="mitem disabled">New Folder</div>
-      <div class="mitem disabled">Open</div>
+      <div class="mitem" data-action="newfolder">New Folder</div>
+      <div class="mitem" data-action="newtxt">New Text File</div>
+      <div class="mitem" data-action="open">Open</div>
       <div class="mitem" data-action="close">Close Window</div>
       <div class="msep"></div>
       <div class="mitem" data-action="about">Get Info</div>
       <div class="msep"></div>
-      <div class="mitem disabled">Quit</div>
+      <div class="mitem" data-action="close">Quit</div>
     </div>
   </div>
   <div class="menu">
@@ -654,27 +774,27 @@ body.win-dragging iframe{pointer-events:none;}
       <div class="mitem disabled">Undo</div>
       <div class="msep"></div>
       <div class="mitem disabled">Cut</div>
-      <div class="mitem disabled">Copy</div>
+      <div class="mitem" data-action="copy">Copy</div>
       <div class="mitem disabled">Paste</div>
       <div class="mitem disabled">Clear</div>
       <div class="msep"></div>
-      <div class="mitem disabled">Select All</div>
+      <div class="mitem" data-action="selectall">Select All</div>
     </div>
   </div>
   <div class="menu">
     <div class="mtitle">View</div>
     <div class="mdrop">
-      <div class="mitem">&#10003; by Icon</div>
-      <div class="mitem disabled">by Name</div>
-      <div class="mitem disabled">by Size</div>
-      <div class="mitem disabled">by Date</div>
+      <div class="mitem" data-view="icon"><span class="mchk">&#10003;</span>by Icon</div>
+      <div class="mitem" data-view="name"><span class="mchk"></span>by Name</div>
+      <div class="mitem" data-view="size"><span class="mchk"></span>by Size</div>
+      <div class="mitem" data-view="date"><span class="mchk"></span>by Date</div>
     </div>
   </div>
   <div class="menu">
     <div class="mtitle">Special</div>
     <div class="mdrop">
       <div class="mitem" data-action="cleanup">Clean Up Desktop</div>
-      <div class="mitem disabled">Empty Trash&hellip;</div>
+      <div class="mitem" data-action="emptytrash">Empty Trash&hellip;</div>
       <div class="msep"></div>
       <div class="mitem" data-bg="blank"><span class="mchk"></span>Blank Wallpaper</div>
       <div class="mitem" data-bg="gun"><span class="mchk"></span>Game of Life: Glider Guns</div>
@@ -683,14 +803,14 @@ body.win-dragging iframe{pointer-events:none;}
       <div class="mitem" data-bg="edit"><span class="mchk"></span>Game of Life: Draw Your Own&hellip;</div>
       <div class="msep"></div>
       <div class="mitem" data-action="restart">Restart</div>
-      <div class="mitem disabled">Shut Down</div>
+      <div class="mitem" data-action="shutdown">Shut Down</div>
     </div>
   </div>
   <div class="menu">
     <div class="mtitle">Help</div>
     <div class="mdrop">
       <div class="mitem" data-action="about">About This Website&hellip;</div>
-      <div class="mitem disabled">Show Balloons</div>
+      <div class="mitem" data-action="balloons" id="mi-balloons">Show Balloons</div>
     </div>
   </div>
   <div id="mb-right">
@@ -712,27 +832,27 @@ body.win-dragging iframe{pointer-events:none;}
   <canvas id="life"></canvas>
 
   <div id="icons">
-    <div class="dicon" id="dicon-about" data-win="about">
+    <div class="dicon" id="dicon-about" data-win="about" data-bln="Opens a window with information about Cooper.">
       <svg viewBox="0 0 32 32"><use href="#icon-about"/></svg>
       <div class="dlabel">About Me</div>
     </div>
-    <div class="dicon" id="dicon-projects" data-win="projects">
+    <div class="dicon" id="dicon-projects" data-win="projects" data-bln="A folder containing Cooper's projects. Double-click to open it.">
       <svg viewBox="0 0 32 32"><use href="#icon-folder"/></svg>
       <div class="dlabel">Projects</div>
     </div>
-    <div class="dicon" id="dicon-resume" data-win="resume">
+    <div class="dicon" id="dicon-resume" data-win="resume" data-bln="Cooper's resume, opened with SimpleText. Double-click to read it.">
       <svg viewBox="0 0 32 32"><use href="#icon-doc"/></svg>
       <div class="dlabel">Writing</div>
     </div>
-    <div class="dicon" id="dicon-contact" data-win="contact">
+    <div class="dicon" id="dicon-contact" data-win="contact" data-bln="Ways to reach Cooper: email, LinkedIn, or Twitter.">
       <svg viewBox="0 0 32 32"><use href="#icon-mail"/></svg>
       <div class="dlabel">Contact</div>
     </div>
-    <div class="dicon" id="dicon-solitaire" data-win="solitaire">
+    <div class="dicon" id="dicon-solitaire" data-win="solitaire" data-bln="Klondike Solitaire. Double-click to play a game.">
       <svg viewBox="0 0 32 32"><use href="#icon-cards"/></svg>
       <div class="dlabel">Solitaire</div>
     </div>
-    <div class="dicon trash" id="dicon-trash">
+    <div class="dicon trash" id="dicon-trash" data-bln="The Trash holds items you no longer want. It is empty.">
       <svg viewBox="0 0 32 32"><use href="#icon-trash"/></svg>
       <div class="dlabel">Trash</div>
       <div class="tip">Trash (0 items)</div>
@@ -838,9 +958,19 @@ body.win-dragging iframe{pointer-events:none;}
         <div class="tbox zoombox"><div class="inner"></div></div>
       </div>
       <div class="st-toolbar">
-        <span class="btn" aria-disabled="true"><b>B</b></span>
-        <span class="btn" aria-disabled="true"><i>I</i></span>
-        <span class="btn" aria-disabled="true">Size &#9662;</span>
+        <span class="btn" id="st-bold"><b>B</b></span>
+        <span class="btn" id="st-italic"><i>I</i></span>
+        <span class="st-sizewrap">
+          <span class="btn" id="st-size">Size &#9662;</span>
+          <div class="mdrop st-sizes" id="st-sizes">
+            <div class="mitem" data-pt="9"><span class="mchk"></span>9 Point</div>
+            <div class="mitem" data-pt="10"><span class="mchk"></span>10 Point</div>
+            <div class="mitem" data-pt="12"><span class="mchk">&#10003;</span>12 Point</div>
+            <div class="mitem" data-pt="14"><span class="mchk"></span>14 Point</div>
+            <div class="mitem" data-pt="18"><span class="mchk"></span>18 Point</div>
+            <div class="mitem" data-pt="24"><span class="mchk"></span>24 Point</div>
+          </div>
+        </span>
       </div>
       <div class="win-body">
         <div class="resume-text">
@@ -971,7 +1101,30 @@ body.win-dragging iframe{pointer-events:none;}
     </div>
   </div>
 
+  <!-- ===== Desktop selection marquee ===== -->
+  <div id="marquee"></div>
+
 </div>
+
+<!-- ===== Alert dialog (Empty Trash, empty folders) ===== -->
+<div id="alert-box">
+  <div class="alert-inner">
+    <div class="alert-row">
+      <svg viewBox="0 0 32 32"><use id="alert-icon" href="#icon-mac"/></svg>
+      <div class="alert-text" id="alert-text"></div>
+    </div>
+    <div class="alert-btns"><span class="btn" id="alert-cancel">Cancel</span><span class="dring"><span class="btn btn-default" id="alert-ok">OK &#8629;</span></span></div>
+  </div>
+</div>
+
+<!-- ===== Shut Down screen ===== -->
+<div id="shutdown">
+  <div class="sd-msg">It is now safe to turn off your Macintosh.</div>
+  <div class="sd-sub">Click anywhere to restart</div>
+</div>
+
+<!-- ===== Balloon help ===== -->
+<div id="balloon"></div>
 
 <script>
 (function(){
@@ -1007,8 +1160,9 @@ var MIN = {
 function placeDefaults(){
   Object.keys(wins).forEach(function(id){
     var el = wins[id].el;
-    el.style.width = '';
-    el.style.height = '';
+    /* static windows size via CSS; dynamic (folder/txt) windows via data-w/h */
+    el.style.width = el.dataset.w ? el.dataset.w + 'px' : '';
+    el.style.height = el.dataset.h ? el.dataset.h + 'px' : '';
     delete el.dataset.prevRect;
     if (el.dataset.x){ el.style.left = el.dataset.x + 'px'; el.style.top = el.dataset.y + 'px'; }
   });
@@ -1247,8 +1401,8 @@ window.addEventListener('message', function(e){
   else if (e.data === 'solitaire-focus') bringToFront('solitaire');
 });
 
-/* ---------- wire up windows ---------- */
-Object.keys(wins).forEach(function(id){
+/* ---------- wire up windows (also used for dynamic folder/txt windows) ---------- */
+function wireWindow(id){
   var el = wins[id].el;
   el.addEventListener('mousedown', function(){ bringToFront(id); });
   el.querySelector('.closebox').addEventListener('click', function(e){
@@ -1259,7 +1413,8 @@ Object.keys(wins).forEach(function(id){
   if (zb) zb.addEventListener('click', function(e){ e.stopPropagation(); toggleZoom(id); });
   makeDraggable(id);
   makeResizable(id);
-});
+}
+Object.keys(wins).forEach(wireWindow);
 
 /* ---------- desktop icons ---------- */
 function deselectIcons(){
@@ -1269,7 +1424,16 @@ function deselectIcons(){
     if (!winId || !wins[winId].el.classList.contains('open')) i.classList.remove('selected');
   });
 }
-document.querySelectorAll('.dicon').forEach(function(icon){
+/* select one icon, dropping the rest (icons of open windows stay selected) */
+function selectOnly(icon){
+  document.querySelectorAll('.dicon.selected').forEach(function(i){
+    var winId = i.dataset.win;
+    if (i !== icon && (!winId || !wins[winId].el.classList.contains('open'))) i.classList.remove('selected');
+  });
+  icon.classList.add('selected');
+}
+var iconDragMoved = false; /* set during a drag so the trailing click doesn't collapse the selection */
+function hookIconEvents(icon){
   icon.addEventListener('click', function(e){
     e.stopPropagation();
     /* mobile: the strip is a table of contents — jump to that window */
@@ -1278,17 +1442,18 @@ document.querySelectorAll('.dicon').forEach(function(icon){
       if (winId && wins[winId] && winId !== 'solitaire') wins[winId].el.scrollIntoView();
       return;
     }
-    document.querySelectorAll('.dicon.selected').forEach(function(i){
-      var winId = i.dataset.win;
-      if (i !== icon && (!winId || !wins[winId].el.classList.contains('open'))) i.classList.remove('selected');
-    });
-    icon.classList.add('selected');
+    if (iconDragMoved){ iconDragMoved = false; return; }
+    if (e.shiftKey) return; /* shift-toggle handled on mousedown */
+    selectOnly(icon);
   });
   icon.addEventListener('dblclick', function(e){
     e.stopPropagation();
     if (icon.dataset.win) openWin(icon.dataset.win);
+    else if (icon.dataset.fid) openItem(parseInt(icon.dataset.fid, 10));
+    else if (icon.classList.contains('trash')) openTrash();
   });
-});
+}
+document.querySelectorAll('.dicon').forEach(hookIconEvents);
 
 /* ---------- icon dragging / rearranging ---------- */
 var iconsBox = document.getElementById('icons');
@@ -1325,27 +1490,53 @@ function makeIconDraggable(icon){
   function start(e){
     if (isMobile()) return; /* icons are a static strip; let the page scroll */
     if (e.type === 'mousedown' && e.button !== 0) return;
-    /* select on mousedown, like the real Finder */
-    dicons.forEach(function(i){
-      var winId = i.dataset.win;
-      if (i !== icon && (!winId || !wins[winId].el.classList.contains('open'))) i.classList.remove('selected');
+    iconDragMoved = false;
+    /* select on mousedown, like the real Finder; shift adds/removes from the set */
+    var wasSelected = icon.classList.contains('selected');
+    if (e.shiftKey){
+      icon.classList.toggle('selected');
+      if (!icon.classList.contains('selected')) return; /* shift-deselect: nothing to drag */
+    } else if (!wasSelected){
+      selectOnly(icon);
+    }
+    /* an already-selected icon drags the whole selection as one unit;
+       a freshly clicked one drags alone */
+    var members = (wasSelected || e.shiftKey)
+      ? dicons.filter(function(i){ return i.classList.contains('selected'); })
+      : [icon];
+    var group = members.map(function(i){
+      return {
+        ic: i,
+        x0: parseInt(i.style.left, 10) || 0,
+        y0: parseInt(i.style.top, 10) || 0
+      };
     });
-    icon.classList.add('selected');
+    /* clamp the delta so the whole group stays on the desktop, keeping its shape */
+    var dxLo = -Infinity, dxHi = Infinity, dyLo = -Infinity, dyHi = Infinity;
+    group.forEach(function(g){
+      dxLo = Math.max(dxLo, -g.x0);
+      dxHi = Math.min(dxHi, desktop.clientWidth - g.ic.offsetWidth - g.x0);
+      dyLo = Math.max(dyLo, -g.y0);
+      dyHi = Math.min(dyHi, desktop.clientHeight - g.ic.offsetHeight - g.y0);
+    });
     var p = e.touches ? e.touches[0] : e;
     var sx = p.clientX, sy = p.clientY;
-    var x0 = parseInt(icon.style.left, 10) || 0;
-    var y0 = parseInt(icon.style.top, 10) || 0;
+    var lx = sx, ly = sy;
     var moved = false;
     function move(ev){
       var q = ev.touches ? ev.touches[0] : ev;
+      lx = q.clientX; ly = q.clientY;
       var dx = q.clientX - sx, dy = q.clientY - sy;
       if (!moved && Math.abs(dx) < 4 && Math.abs(dy) < 4) return;
       moved = true;
       iconsMoved = true;
-      var x = Math.max(0, Math.min(x0 + dx, desktop.clientWidth - icon.offsetWidth));
-      var y = Math.max(0, Math.min(y0 + dy, desktop.clientHeight - icon.offsetHeight));
-      icon.style.left = x + 'px';
-      icon.style.top = y + 'px';
+      iconDragMoved = true;
+      dx = Math.max(dxLo, Math.min(dx, dxHi));
+      dy = Math.max(dyLo, Math.min(dy, dyHi));
+      group.forEach(function(g){
+        g.ic.style.left = (g.x0 + dx) + 'px';
+        g.ic.style.top  = (g.y0 + dy) + 'px';
+      });
       if (ev.cancelable) ev.preventDefault();
     }
     function up(){
@@ -1353,6 +1544,7 @@ function makeIconDraggable(icon){
       document.removeEventListener('mouseup', up);
       document.removeEventListener('touchmove', move);
       document.removeEventListener('touchend', up);
+      if (moved) dropDicons(group, lx, ly);
     }
     document.addEventListener('mousemove', move);
     document.addEventListener('mouseup', up);
@@ -1364,13 +1556,43 @@ function makeIconDraggable(icon){
 }
 dicons.forEach(makeIconDraggable);
 
-/* ---------- desktop click: deactivate everything ---------- */
+/* ---------- desktop mousedown: deselect, then rubber-band select ---------- */
+var marquee = document.getElementById('marquee');
 desktop.addEventListener('mousedown', function(e){
-  if (e.target === desktop || e.target.id === 'icons'){
-    setActive(null);
-    deselectIcons();
-    document.querySelectorAll('.dicon.selected').forEach(function(i){ i.classList.remove('selected'); });
+  if (e.target !== desktop && e.target.id !== 'icons') return;
+  setActive(null);
+  deselectIcons();
+  document.querySelectorAll('.dicon.selected').forEach(function(i){ i.classList.remove('selected'); });
+  if (e.button !== 0) return;
+  e.preventDefault();
+  var dr = desktop.getBoundingClientRect();
+  var sx = e.clientX - dr.left, sy = e.clientY - dr.top;
+  var live = false;
+  function move(ev){
+    var cx = Math.max(0, Math.min(ev.clientX - dr.left, desktop.clientWidth));
+    var cy = Math.max(0, Math.min(ev.clientY - dr.top, desktop.clientHeight));
+    if (!live && Math.abs(cx - sx) < 3 && Math.abs(cy - sy) < 3) return; /* 3px threshold so plain clicks don't flash a marquee */
+    live = true;
+    var x = Math.min(sx, cx), y = Math.min(sy, cy);
+    var w = Math.abs(cx - sx), h = Math.abs(cy - sy);
+    marquee.style.left = x + 'px';
+    marquee.style.top = y + 'px';
+    marquee.style.width = w + 'px';
+    marquee.style.height = h + 'px';
+    marquee.style.display = 'block';
+    var L = dr.left + x, T = dr.top + y, R = L + w, B = T + h;
+    document.querySelectorAll('.dicon').forEach(function(ic){
+      var r = ic.getBoundingClientRect();
+      ic.classList.toggle('selected', r.left < R && r.right > L && r.top < B && r.bottom > T);
+    });
   }
+  function up(){
+    marquee.style.display = 'none';
+    document.removeEventListener('mousemove', move);
+    document.removeEventListener('mouseup', up);
+  }
+  document.addEventListener('mousemove', move);
+  document.addEventListener('mouseup', up);
 });
 
 /* ---------- Game of Life wallpaper ---------- */
@@ -1575,12 +1797,532 @@ menus.forEach(function(menu){
 document.addEventListener('mousedown', function(e){
   if (!e.target.closest('.menu')) closeMenus();
 });
+/* keep text/icon selections alive while clicking menus (for Edit > Copy) */
+document.getElementById('menubar').addEventListener('mousedown', function(e){ e.preventDefault(); });
+
+/* ---------- alert dialog (plain OK, or OK/Cancel confirm) ---------- */
+var alertBox = document.getElementById('alert-box');
+var alertOnOk = null;
+function showAlert(text, icon){
+  document.getElementById('alert-text').textContent = text;
+  document.getElementById('alert-icon').setAttribute('href', icon || '#icon-mac');
+  alertBox.classList.remove('confirm');
+  alertOnOk = null;
+  alertBox.classList.add('show');
+}
+function showConfirm(text, icon, onOk){
+  showAlert(text, icon);
+  alertBox.classList.add('confirm');
+  alertOnOk = onOk;
+}
+function hideAlert(ok){
+  alertBox.classList.remove('show');
+  var cb = alertOnOk;
+  alertOnOk = null;
+  if (ok && cb) cb();
+}
+document.getElementById('alert-ok').addEventListener('click', function(){ hideAlert(true); });
+document.getElementById('alert-cancel').addEventListener('click', function(){ hideAlert(false); });
+document.addEventListener('keydown', function(e){
+  if (!alertBox.classList.contains('show')) return;
+  if (e.key === 'Enter') hideAlert(true);
+  else if (e.key === 'Escape') hideAlert(false);
+});
+
+/* ---------- View menu: icon sorting ---------- */
+/* fake Finder metadata: size in K, date = bigger is newer */
+var ICONMETA = {
+  'dicon-about':     { size: 4,   date: 6 },
+  'dicon-projects':  { size: 64,  date: 4 },
+  'dicon-resume':    { size: 16,  date: 5 },
+  'dicon-contact':   { size: 2,   date: 3 },
+  'dicon-solitaire': { size: 128, date: 2 },
+  'dicon-trash':     { size: 0,   date: 1 }
+};
+var origOrder = dicons.slice();
+var newestDate = 10; /* new folders count up from here */
+function iconMeta(ic){ return ICONMETA[ic.id] || ic._meta || { size: 0, date: 0 }; }
+function iconLabel(ic){ return ic.querySelector('.dlabel').textContent.toLowerCase(); }
+function sortIcons(v){
+  var arr;
+  if (v === 'icon'){
+    arr = origOrder.filter(function(ic){ return ic.id !== 'dicon-trash'; });
+  } else {
+    arr = dicons.filter(function(ic){ return ic.id !== 'dicon-trash'; }).sort(function(a, b){
+      if (v === 'name'){
+        var na = iconLabel(a), nb = iconLabel(b);
+        return na < nb ? -1 : na > nb ? 1 : 0;
+      }
+      var ma = iconMeta(a), mb = iconMeta(b);
+      return v === 'size' ? mb.size - ma.size : mb.date - ma.date;
+    });
+  }
+  arr.push(document.getElementById('dicon-trash')); /* Trash stays last */
+  arr.forEach(function(ic){ iconsBox.appendChild(ic); });
+  layoutIcons();
+  document.querySelectorAll('.mitem[data-view]').forEach(function(it){
+    it.querySelector('.mchk').textContent = it.dataset.view === v ? '✓' : '';
+  });
+}
+
+/* ---------- mini file system: folders you can enter, text files you can edit ----------
+   fsItems: fid -> { type:'folder'|'txt', name, items:[fid], content, icon, winId }.
+   Folder/editor windows are real .window elements registered in `wins` (ids 'fld<fid>' /
+   'txt<fid>'), so openWin/closeWin/zoom/drag/resize all work on them unchanged. */
+var fsItems = {};
+var fsN = 0, folderN = 0, txtN = 0, deskSpawnN = 0, dynWinN = 0;
+
+function buildWindow(id, app, w, h, icon){
+  dynWinN++;
+  var el = document.createElement('div');
+  el.className = 'window';
+  el.id = 'win-' + id;
+  el.dataset.app = app;
+  var x = 140 + ((dynWinN - 1) % 7) * 26;
+  var y = 70 + ((dynWinN - 1) % 7) * 24;
+  el.dataset.x = x; el.dataset.y = y; el.dataset.w = w; el.dataset.h = h;
+  el.style.left = x + 'px'; el.style.top = y + 'px';
+  el.style.width = w + 'px'; el.style.height = h + 'px';
+  el.innerHTML =
+    '<div class="win-frame">' +
+      '<div class="titlebar">' +
+        '<div class="tbox closebox"><div class="inner"></div></div>' +
+        '<div class="title"><span></span></div>' +
+        '<div class="tbox zoombox"><div class="inner"></div></div>' +
+      '</div>' +
+      '<div class="win-body"></div>' +
+      '<div class="grow">' +
+        '<svg width="13" height="13" viewBox="0 0 13 13">' +
+          '<path d="M12 1 L1 12" stroke="#888888" stroke-width="1" fill="none"/>' +
+          '<path d="M12 5 L5 12" stroke="#888888" stroke-width="1" fill="none"/>' +
+          '<path d="M12 9 L9 12" stroke="#888888" stroke-width="1" fill="none"/>' +
+        '</svg>' +
+      '</div>' +
+    '</div>';
+  el.querySelector('.closebox').dataset.bln = 'Closes this window.';
+  el.querySelector('.zoombox').dataset.bln = 'Zooms this window between two sizes.';
+  desktop.appendChild(el);
+  wins[id] = { el: el, icon: icon || null };
+  MIN[id] = { w: 240, h: 140 };
+  wireWindow(id);
+  return el;
+}
+
+function itemHref(item){ return item.type === 'folder' ? '#icon-folder' : '#icon-doc'; }
+
+/* every fs item lives in exactly one place: item.parent is 'desk', 'trash', or a folder fid */
+var trashFids = [];
+var trashIcon = document.getElementById('dicon-trash');
+
+function updateTrash(){
+  var n = trashFids.length;
+  trashIcon.querySelector('use').setAttribute('href', n ? '#icon-trash-full' : '#icon-trash');
+  trashIcon.querySelector('.tip').textContent = 'Trash (' + n + (n === 1 ? ' item)' : ' items)');
+  trashIcon.dataset.bln = n
+    ? 'The Trash holds items you no longer want. It contains ' + n + (n === 1 ? ' item.' : ' items.')
+    : 'The Trash holds items you no longer want. It is empty.';
+  if (wins.trash){
+    wins.trash.el.querySelector('.fld-status').textContent =
+      n + (n === 1 ? ' item' : ' items') + ', 42 MB available';
+  }
+}
+
+function makeDesktopItemIcon(item, x, y){
+  var d = document.createElement('div');
+  d.className = 'dicon';
+  d.dataset.fid = item.fid;
+  d.innerHTML = '<svg viewBox="0 0 32 32"><use href="' + itemHref(item) + '"/></svg><div class="dlabel"></div>';
+  d.querySelector('.dlabel').textContent = item.name;
+  d._meta = { size: item.type === 'txt' ? 1 : 0, date: ++newestDate };
+  iconsBox.appendChild(d);
+  if (x === undefined){
+    /* fresh items cascade from the top-left */
+    deskSpawnN++;
+    d.style.left = (24 + ((deskSpawnN - 1) % 8) * 22) + 'px';
+    d.style.top  = (24 + ((deskSpawnN - 1) % 8) * 22) + 'px';
+  } else {
+    /* dropped out of a window: land under the cursor, clamped to the desktop */
+    var dr = desktop.getBoundingClientRect();
+    d.style.left = Math.round(Math.max(0, Math.min(x - dr.left - d.offsetWidth / 2, desktop.clientWidth - d.offsetWidth))) + 'px';
+    d.style.top  = Math.round(Math.max(0, Math.min(y - dr.top - 20, desktop.clientHeight - d.offsetHeight))) + 'px';
+  }
+  dicons.push(d);
+  origOrder.push(d);
+  iconsMoved = true;
+  makeIconDraggable(d);
+  hookIconEvents(d);
+  selectOnly(d);
+  return d;
+}
+
+/* in-window file icon: select on mousedown, dblclick opens, drag (dashed ghost) moves it */
+function makeFicon(item, body){
+  var d = document.createElement('div');
+  d.className = 'ficon';
+  d.dataset.fid = item.fid;
+  d.innerHTML = '<svg viewBox="0 0 32 32"><use href="' + itemHref(item) + '"/></svg><div class="flabel"></div>';
+  d.querySelector('.flabel').textContent = item.name;
+  d.addEventListener('dblclick', function(e){
+    e.stopPropagation();
+    openItem(item.fid);
+  });
+  d.addEventListener('mousedown', function(e){
+    if (e.button !== 0) return;
+    e.preventDefault(); /* no label text-selection while dragging */
+    body.querySelectorAll('.ficon.selected').forEach(function(i){ if (i !== d) i.classList.remove('selected'); });
+    d.classList.add('selected');
+    var sx = e.clientX, sy = e.clientY;
+    var r = d.getBoundingClientRect();
+    var ox = sx - r.left, oy = sy - r.top;
+    var ghost = null;
+    function move(ev){
+      if (!ghost){
+        if (Math.abs(ev.clientX - sx) < 4 && Math.abs(ev.clientY - sy) < 4) return;
+        ghost = document.createElement('div');
+        ghost.className = 'dragghost';
+        ghost.style.width = r.width + 'px';
+        ghost.style.height = r.height + 'px';
+        document.body.appendChild(ghost);
+      }
+      ghost.style.left = (ev.clientX - ox) + 'px';
+      ghost.style.top = (ev.clientY - oy) + 'px';
+    }
+    function up(ev){
+      document.removeEventListener('mousemove', move);
+      document.removeEventListener('mouseup', up);
+      if (!ghost) return;
+      ghost.remove();
+      var t = dropTargetAt(ev.clientX, ev.clientY, null);
+      if (t !== 'none') moveItem(item.fid, t, ev.clientX, ev.clientY);
+    }
+    document.addEventListener('mousemove', move);
+    document.addEventListener('mouseup', up);
+  });
+  body.appendChild(d);
+  return d;
+}
+
+function updateFolderStatus(fid){
+  var item = fsItems[fid];
+  if (!item.winId || !wins[item.winId]) return;
+  var n = item.items.length;
+  wins[item.winId].el.querySelector('.fld-status').textContent =
+    n + (n === 1 ? ' item' : ' items') + ', 42 MB available';
+}
+
+/* ----- moving items between the desktop, folders, and the Trash ----- */
+
+/* is fid the folder rootFid itself, or anywhere inside it? (blocks folder-into-itself) */
+function inSubtree(rootFid, fid){
+  if (rootFid === fid) return true;
+  var it = fsItems[rootFid];
+  if (!it || it.type !== 'folder') return false;
+  return it.items.some(function(c){ return inSubtree(c, fid); });
+}
+
+/* the .fld-body of a container, or null if its window was never built */
+function containerBody(loc){
+  if (loc === 'trash') return wins.trash ? wins.trash.el.querySelector('.fld-body') : null;
+  var it = fsItems[loc];
+  return (it && it.winId && wins[it.winId]) ? wins[it.winId].el.querySelector('.fld-body') : null;
+}
+
+function refreshContainer(loc){
+  if (loc === 'trash') updateTrash();
+  else if (loc !== 'desk') updateFolderStatus(loc);
+}
+
+function detachItem(item){
+  if (item.parent === 'desk'){
+    var i = dicons.indexOf(item.icon);
+    if (i !== -1) dicons.splice(i, 1);
+    i = origOrder.indexOf(item.icon);
+    if (i !== -1) origOrder.splice(i, 1);
+  } else {
+    var list = item.parent === 'trash' ? trashFids : fsItems[item.parent].items;
+    var k = list.indexOf(item.fid);
+    if (k !== -1) list.splice(k, 1);
+  }
+  if (item.icon) item.icon.remove();
+  item.icon = null;
+  refreshContainer(item.parent);
+}
+
+function placeItem(item, dest, x, y){
+  item.parent = dest;
+  if (dest === 'desk'){
+    item.icon = makeDesktopItemIcon(item, x, y);
+  } else {
+    var list = dest === 'trash' ? trashFids : fsItems[dest].items;
+    list.push(item.fid);
+    var body = containerBody(dest);
+    item.icon = body ? makeFicon(item, body) : null;
+    refreshContainer(dest);
+  }
+  /* keep the zoom animation anchored to the item's current icon */
+  if (item.winId && wins[item.winId]) wins[item.winId].icon = item.icon;
+}
+
+function moveItem(fid, dest, x, y){
+  var item = fsItems[fid];
+  if (!item) return false;
+  if (dest === item.parent) return true;
+  if (typeof dest === 'number' && inSubtree(fid, dest)) return false;
+  detachItem(item);
+  placeItem(item, dest, x, y);
+  return true;
+}
+
+/* what is under the drop point: 'trash', a folder fid, 'desk', or 'none' (blocked) */
+function dropTargetAt(x, y, excludeEls){
+  /* the topmost open window under the point wins */
+  var bestId = null, bestZ = -1;
+  Object.keys(wins).forEach(function(id){
+    var el = wins[id].el;
+    if (!el.classList.contains('open')) return;
+    var r = el.getBoundingClientRect();
+    if (x < r.left || x > r.right || y < r.top || y > r.bottom) return;
+    var z = parseInt(el.style.zIndex || 20, 10);
+    if (z > bestZ){ bestZ = z; bestId = id; }
+  });
+  if (bestId){
+    if (bestId === 'trash') return 'trash';
+    if (bestId.indexOf('fld') === 0) return parseInt(bestId.slice(3), 10);
+    return 'none'; /* some other app's window: not a drop target */
+  }
+  /* bare desktop: the Trash and (closed) folder icons accept drops */
+  var hit = null;
+  dicons.forEach(function(ic){
+    if (excludeEls && excludeEls.indexOf(ic) !== -1) return;
+    var r = ic.getBoundingClientRect();
+    if (x < r.left || x > r.right || y < r.top || y > r.bottom) return;
+    if (ic.id === 'dicon-trash') hit = 'trash';
+    else if (ic.dataset.fid && fsItems[ic.dataset.fid].type === 'folder') hit = parseInt(ic.dataset.fid, 10);
+  });
+  return hit === null ? 'desk' : hit;
+}
+
+/* desktop icons released after a drag: fs items move, system icons snap back */
+function dropDicons(group, x, y){
+  var t = dropTargetAt(x, y, group.map(function(g){ return g.ic; }));
+  if (t === 'desk' || t === 'none') return; /* stays where it was dragged */
+  var sys = [];
+  group.forEach(function(g){
+    if (g.ic.dataset.fid){
+      if (!moveItem(parseInt(g.ic.dataset.fid, 10), t)){
+        g.ic.style.left = g.x0 + 'px';
+        g.ic.style.top  = g.y0 + 'px';
+      }
+    } else {
+      sys.push(g);
+    }
+  });
+  if (sys.length){
+    sys.forEach(function(g){
+      g.ic.style.left = g.x0 + 'px';
+      g.ic.style.top  = g.y0 + 'px';
+    });
+    if (t === 'trash'){
+      showAlert('The item “' + sys[0].ic.querySelector('.dlabel').textContent +
+        '” cannot be moved to the Trash, because it is required by the system.', '#icon-trash');
+    }
+  }
+}
+
+function fsCreate(type, parentFid){
+  fsN++;
+  var name;
+  if (type === 'folder'){
+    folderN++;
+    name = folderN === 1 ? 'untitled folder' : 'untitled folder ' + folderN;
+  } else {
+    txtN++;
+    name = txtN === 1 ? 'untitled.txt' : 'untitled ' + txtN + '.txt';
+  }
+  var item = { fid: fsN, type: type, name: name, items: [], content: '', icon: null, winId: null, parent: null };
+  fsItems[fsN] = item;
+  placeItem(item, parentFid || 'desk');
+  return item;
+}
+
+/* shared Finder-window chrome: title icon, status strip, icon grid */
+function addFinderChrome(el, iconHref, titleText){
+  var span = el.querySelector('.title span');
+  span.innerHTML = '<svg class="ticon" viewBox="0 0 32 32"><use href="' + iconHref + '"/></svg> ';
+  span.appendChild(document.createTextNode(titleText));
+  var body = el.querySelector('.win-body');
+  var st = document.createElement('div');
+  st.className = 'fld-status';
+  el.querySelector('.win-frame').insertBefore(st, body);
+  var fb = document.createElement('div');
+  fb.className = 'fld-body';
+  body.appendChild(fb);
+  body.addEventListener('mousedown', function(e){
+    if (!e.target.closest('.ficon')){
+      fb.querySelectorAll('.ficon.selected').forEach(function(i){ i.classList.remove('selected'); });
+    }
+  });
+  return fb;
+}
+
+function openFolder(fid){
+  var item = fsItems[fid];
+  if (!item.winId || !wins[item.winId]){
+    item.winId = 'fld' + fid;
+    var el = buildWindow(item.winId, 'Finder', 380, 250, item.icon);
+    var body = addFinderChrome(el, '#icon-folder', item.name);
+    item.items.forEach(function(c){ fsItems[c].icon = makeFicon(fsItems[c], body); });
+    updateFolderStatus(fid);
+  }
+  openWin(item.winId);
+}
+
+function openTrash(){
+  if (!wins.trash){
+    var el = buildWindow('trash', 'Finder', 380, 250, trashIcon);
+    var body = addFinderChrome(el, '#icon-trash', 'Trash');
+    trashFids.forEach(function(c){ fsItems[c].icon = makeFicon(fsItems[c], body); });
+    updateTrash();
+  }
+  openWin('trash');
+}
+
+function openTxt(fid){
+  var item = fsItems[fid];
+  if (!item.winId || !wins[item.winId]){
+    item.winId = 'txt' + fid;
+    var el = buildWindow(item.winId, 'SimpleText', 420, 320, item.icon);
+    el.querySelector('.title span').textContent = item.name;
+    var ed = document.createElement('div');
+    ed.className = 'txt-edit';
+    try { ed.contentEditable = 'plaintext-only'; } catch (_) { /* older engines */ }
+    if (ed.contentEditable !== 'plaintext-only') ed.contentEditable = 'true';
+    ed.setAttribute('spellcheck', 'false');
+    ed.innerText = item.content;
+    ed.addEventListener('input', function(){ item.content = ed.innerText; });
+    el.querySelector('.win-body').appendChild(ed);
+  }
+  openWin(item.winId);
+}
+
+function openItem(fid){
+  if (fsItems[fid].type === 'folder') openFolder(fid);
+  else openTxt(fid);
+}
+
+/* ----- Empty Trash: really deletes items, their contents, and their windows ----- */
+function itemSizeK(fid){
+  var it = fsItems[fid];
+  if (it.type === 'txt') return 4;
+  return 1 + it.items.reduce(function(s, c){ return s + itemSizeK(c); }, 0);
+}
+
+function destroyItem(fid){
+  var it = fsItems[fid];
+  if (!it) return;
+  it.items.slice().forEach(destroyItem);
+  if (it.winId && wins[it.winId]){
+    var wel = wins[it.winId].el;
+    if (wel.classList.contains('active')) setActive(null);
+    wel.remove();
+    delete wins[it.winId];
+    delete MIN[it.winId];
+  }
+  if (it.icon) it.icon.remove();
+  delete fsItems[fid];
+}
+
+function emptyTrashNow(){
+  trashFids.slice().forEach(destroyItem);
+  trashFids.length = 0;
+  updateTrash();
+}
+
+/* New Folder / New Text File land in the active folder window, else on the desktop */
+function activeFolderFid(){
+  var id = activeId();
+  if (id && id.indexOf('fld') === 0) return parseInt(id.slice(3), 10);
+  return null;
+}
+
+/* ---------- Help > Show Balloons ---------- */
+var balloon = document.getElementById('balloon');
+var balloonsOn = false;
+document.querySelectorAll('.closebox').forEach(function(b){ b.dataset.bln = 'Closes this window.'; });
+document.querySelectorAll('.zoombox').forEach(function(b){ b.dataset.bln = 'Zooms this window between two sizes.'; });
+document.getElementById('battery').dataset.bln = 'Battery level: full. This Macintosh never runs out.';
+document.getElementById('clock').dataset.bln = 'The current day and time.';
+document.addEventListener('mouseover', function(e){
+  if (!balloonsOn){ balloon.style.display = 'none'; return; }
+  var t = e.target.closest ? e.target.closest('[data-bln]') : null;
+  if (!t){ balloon.style.display = 'none'; return; }
+  balloon.textContent = t.dataset.bln;
+  balloon.style.display = 'block';
+  var r = t.getBoundingClientRect();
+  var x = Math.max(4, Math.min(r.left + r.width / 2, window.innerWidth - balloon.offsetWidth - 4));
+  var y = r.bottom + 6;
+  if (y + balloon.offsetHeight > window.innerHeight - 4) y = r.top - balloon.offsetHeight - 6;
+  balloon.style.left = x + 'px';
+  balloon.style.top = y + 'px';
+});
+
 var actions = {
   about: function(){ openWin('about'); },
   close: function(){ var id = activeId(); if (id) closeWin(id); },
   cleanup: function(){ placeDefaults(); layoutIcons(); },
-  restart: function(){ window.location.reload(); }
+  restart: function(){ window.location.reload(); },
+  newfolder: function(){ fsCreate('folder', activeFolderFid()); },
+  newtxt: function(){ fsCreate('txt', activeFolderFid()); },
+  open: function(){
+    document.querySelectorAll('.dicon.selected').forEach(function(ic){
+      if (ic.dataset.win) openWin(ic.dataset.win);
+      else if (ic.dataset.fid) openItem(parseInt(ic.dataset.fid, 10));
+      else if (ic.classList.contains('trash')) openTrash();
+    });
+    document.querySelectorAll('.ficon.selected').forEach(function(ic){
+      openItem(parseInt(ic.dataset.fid, 10));
+    });
+  },
+  copy: function(){
+    var text = String(window.getSelection());
+    if (!text){
+      var names = [];
+      document.querySelectorAll('.dicon.selected .dlabel, .ficon.selected .flabel').forEach(function(l){ names.push(l.textContent); });
+      text = names.join('\n');
+    }
+    if (text && navigator.clipboard) navigator.clipboard.writeText(text).catch(function(){});
+  },
+  selectall: function(){
+    var id = activeId();
+    if (id === 'resume'){
+      /* SimpleText is frontmost: select the document text */
+      var rng = document.createRange();
+      rng.selectNodeContents(wins.resume.el.querySelector('.resume-text'));
+      var s = window.getSelection();
+      s.removeAllRanges();
+      s.addRange(rng);
+    } else {
+      document.querySelectorAll('.dicon').forEach(function(i){ i.classList.add('selected'); });
+    }
+  },
+  emptytrash: function(){
+    var n = trashFids.length;
+    if (!n){ showAlert('There are no items in the Trash.', '#icon-trash'); return; }
+    var k = trashFids.reduce(function(s, fid){ return s + itemSizeK(fid); }, 0);
+    showConfirm(
+      'The Trash contains ' + n + (n === 1 ? ' item, which uses ' : ' items, which use ') + k +
+      'K of disk space. Are you sure you want to permanently remove ' +
+      (n === 1 ? 'it?' : 'these items?'),
+      '#icon-trash-full', emptyTrashNow);
+  },
+  shutdown: function(){ document.getElementById('shutdown').classList.add('show'); },
+  balloons: function(){
+    balloonsOn = !balloonsOn;
+    document.getElementById('mi-balloons').textContent = balloonsOn ? 'Hide Balloons' : 'Show Balloons';
+    if (!balloonsOn) balloon.style.display = 'none';
+  }
 };
+document.getElementById('shutdown').addEventListener('click', function(){ window.location.reload(); });
 document.querySelectorAll('.mitem').forEach(function(item){
   item.addEventListener('click', function(){
     if (item.classList.contains('disabled')) return;
@@ -1588,7 +2330,34 @@ document.querySelectorAll('.mitem').forEach(function(item){
     var a = item.dataset.action;
     if (a && actions[a]) actions[a]();
     if (item.dataset.bg) life.set(item.dataset.bg);
+    if (item.dataset.view) sortIcons(item.dataset.view);
   });
+});
+
+/* ---------- SimpleText toolbar (Resume window) ---------- */
+var resumeText = wins.resume.el.querySelector('.resume-text');
+var stBold = document.getElementById('st-bold');
+var stItalic = document.getElementById('st-italic');
+var stSizes = document.getElementById('st-sizes');
+stBold.addEventListener('click', function(){
+  stBold.classList.toggle('on', resumeText.classList.toggle('st-bold'));
+});
+stItalic.addEventListener('click', function(){
+  stItalic.classList.toggle('on', resumeText.classList.toggle('st-italic'));
+});
+document.getElementById('st-size').addEventListener('click', function(){
+  stSizes.classList.toggle('show');
+});
+stSizes.querySelectorAll('.mitem').forEach(function(it){
+  it.addEventListener('click', function(){
+    wins.resume.el.style.setProperty('--stsize', it.dataset.pt + 'px');
+    stSizes.querySelectorAll('.mchk').forEach(function(c){ c.textContent = ''; });
+    it.querySelector('.mchk').textContent = '✓';
+    stSizes.classList.remove('show');
+  });
+});
+document.addEventListener('mousedown', function(e){
+  if (!e.target.closest('.st-sizewrap')) stSizes.classList.remove('show');
 });
 
 /* ---------- projects: grid -> detail ---------- */
