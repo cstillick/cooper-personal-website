@@ -118,15 +118,20 @@ icons, working menu bar, and a playable Solitaire app.
   window, else the desktop — see mini file system above), Open (opens selected icons —
   folders/txt items, selected in-window `.ficon`s too; Trash opens its window), Close Window
   / Quit, Edit → Copy (text selection, else selected icon/file
-  names, via `navigator.clipboard`) and Select All (resume frontmost → selects document text;
-  otherwise selects all icons), View → by Icon/Name/Size/Date (reorders the icon column via
+  names, via `navigator.clipboard`) and Select All (resume or a SimpleText txt window
+  frontmost → selects document text; otherwise selects all icons), Edit → Undo/Cut/Paste/
+  Clear (live only on SimpleText documents: `frontTxtEditor()`/`editorSelection()` gate them,
+  `updateEditMenu()` re-grays the items on every menu open — Undo = `execCommand('undo')`,
+  Cut/Clear = `Selection.deleteFromDocument` (Cut also writes the clipboard), Paste =
+  `clipboard.readText()` inserted at the caret, end-of-doc if none; each dispatches `input`
+  so the fs item's content stays saved), View → by Icon/Name/Size/Date (reorders the icon column via
   `sortIcons`; fake sizes/dates in `ICONMETA`, Trash pinned last, ✓ via `.mchk`), Special →
   Clean Up Desktop (resets window positions/sizes and icon layout — does NOT touch the
   wallpaper), Empty Trash (confirm + real delete — see Trash above), wallpaper switching (below),
   Restart (reload), Shut Down (`#shutdown` black screen, "It is now safe to turn off your
   Macintosh.", click reloads), Help → Show/Hide Balloons (`data-bln` balloon help on icons,
   close/zoom boxes, battery, clock via one `mouseover` delegate + `#balloon` div).
-  Still disabled on purpose: Control Panels, Chooser, Undo, Cut, Paste, Clear (era-correct).
+  Still disabled on purpose: Control Panels, Chooser (era-correct).
   `#menubar` mousedown is `preventDefault`ed so menu clicks don't clear selections (Copy
   depends on this). `#appname` shows active window's `data-app` ("Finder" / "SimpleText" /
   "Solitaire").
@@ -182,7 +187,11 @@ icons, working menu bar, and a playable Solitaire app.
   the window just shows more green felt.
 - postMessage protocol: child sends `'solitaire-quit'` (close box / Game→Quit) and
   `'solitaire-focus'` (any mousedown) → parent calls `closeWin`/`bringToFront`.
-  Standalone visits still work; Quit then navigates to index.html.
+  Standalone visits still work; Quit then navigates to index.html. Standalone zoom box
+  toggles `#gamewin.zoomed` — window fills the screen below the menu bar and the felt
+  stretches like embed mode; titlebar drag stands down while zoomed. `#felt` is
+  `flex:1 1 auto` (basis 0 collapsed its 520px height in the content-sized standalone
+  window; embed/zoomed override `height:auto` and let grow do the stretching).
 - Game specifics: Draw 1/3, standard + Vegas scoring, Ctrl/Cmd+Z undo (snapshot stack,
   cap 200), auto-complete dialog, parabolic bouncing-card win animation (bounce factor 0.7,
   click to dismiss), reduced-motion fallbacks, "requires a mouse" dialog on touch-only.

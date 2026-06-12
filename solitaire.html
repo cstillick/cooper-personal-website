@@ -101,6 +101,12 @@ svg{shape-rendering:crispEdges;}
   border:1px solid #000000;background:transparent;
 }
 
+/* zoomed (standalone): the zoom box toggles the window to fill the screen
+   below the menu bar; the felt stretches just like embed mode */
+#gamewin.zoomed{left:8px !important;top:30px !important;right:8px;bottom:8px;}
+#gamewin.zoomed .win-frame{height:100%;}
+#gamewin.zoomed #felt{width:auto;height:auto;}
+
 /* ---------------- Toolbar ---------------- */
 #toolbar{
   flex:0 0 auto;height:26px;background:var(--face);
@@ -130,7 +136,9 @@ svg{shape-rendering:crispEdges;}
 
 /* ---------------- Felt ---------------- */
 #felt{
-  position:relative;flex:1;width:577px;height:520px;
+  /* basis:auto so the 520px height counts in standalone (basis 0 collapsed it);
+     embed/zoomed set height:auto and grow handles the stretch */
+  position:relative;flex:1 1 auto;width:577px;height:520px;
   background:var(--felt);overflow:visible;
 }
 
@@ -960,6 +968,9 @@ var gamewin = document.getElementById('gamewin');
 var tbar = document.getElementById('tbar');
 document.getElementById('btn-new').addEventListener('click', newGame);
 document.getElementById('closebox').addEventListener('click', quitGame);
+document.getElementById('zoombox').addEventListener('click', function(){
+  gamewin.classList.toggle('zoomed');
+});
 gamewin.addEventListener('mousedown', function(){ gamewin.classList.add('active'); });
 document.body.addEventListener('mousedown', function(e){
   if (e.target === document.body) gamewin.classList.remove('active');
@@ -969,6 +980,7 @@ if (EMBED) document.addEventListener('mousedown', function(){
 });
 if (!EMBED) tbar.addEventListener('mousedown', function(e){
   if (e.target.closest('.tbox')) return;
+  if (gamewin.classList.contains('zoomed')) return;
   var r = gamewin.getBoundingClientRect();
   var ox = e.clientX - r.left, oy = e.clientY - r.top;
   function move(ev){
