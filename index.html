@@ -771,12 +771,12 @@ body.win-dragging iframe{pointer-events:none;}
   <div class="menu">
     <div class="mtitle">Edit</div>
     <div class="mdrop">
-      <div class="mitem disabled">Undo</div>
+      <div class="mitem disabled" id="mi-undo" data-action="undo">Undo</div>
       <div class="msep"></div>
-      <div class="mitem disabled">Cut</div>
+      <div class="mitem disabled" id="mi-cut" data-action="cut">Cut</div>
       <div class="mitem" data-action="copy">Copy</div>
-      <div class="mitem disabled">Paste</div>
-      <div class="mitem disabled">Clear</div>
+      <div class="mitem disabled" id="mi-paste" data-action="paste">Paste</div>
+      <div class="mitem disabled" id="mi-clear" data-action="clear">Clear</div>
       <div class="msep"></div>
       <div class="mitem" data-action="selectall">Select All</div>
     </div>
@@ -911,25 +911,113 @@ body.win-dragging iframe{pointer-events:none;}
             <svg viewBox="0 0 32 32"><use href="#icon-folder"/></svg>
             <div class="plabel">Corridor</div>
           </div>
-          <div class="proj-cell" data-name="Backtesting Engine" data-url="https://github.com/cstillick/backtesting-engine" data-desc="From-scratch Python backtesting engine for algorithmic trading strategies — pluggable strategy interface, bar-by-bar event loop, slippage and commission simulation, and a performance tearsheet (CAGR, Sharpe, Sortino, max drawdown).">
-            <svg viewBox="0 0 32 32"><use href="#icon-folder"/></svg>
-            <div class="plabel">Backtesting Engine</div>
-          </div>
-          <div class="proj-cell" data-name="Crypto Arbitrage" data-url="https://github.com/cstillick/crypto-arbitrage" data-desc="Real-time cross-exchange arbitrage detector streaming Binance and Coinbase best bid/ask via WebSocket into an asyncio-safe price store, computing fee-adjusted spreads every 0.5s and surfacing opportunities in a live Rich terminal UI.">
-            <svg viewBox="0 0 32 32"><use href="#icon-doc"/></svg>
-            <div class="plabel">Crypto Arbitrage</div>
-          </div>
-          <div class="proj-cell" data-name="Stock Screener" data-url="https://github.com/cstillick/stock-screener" data-desc="Full-stack S&amp;P 500 stock screener — FastAPI backend with vectorized pandas indicators (SMA/EMA/RSI/MACD/Bollinger/ATR), composable named signals like golden_cross and bb_squeeze, concurrent yFinance fetching with parquet caching, and a single-page HTML/JS frontend. No database required.">
-            <svg viewBox="0 0 32 32"><use href="#icon-folder"/></svg>
-            <div class="plabel">Stock Screener</div>
+          <div class="proj-cell" data-name="Meeting Notes App" data-url="https://github.com/cstillick/meeting-notes-app" data-desc="An AI meeting notepad for macOS — no bot joins your call. The app captures your microphone and system audio directly, transcribes both live, then uses Claude to merge your rough typed notes with the transcript into structured, enhanced notes.">
+            <svg viewBox="0 0 32 32"><use href="#icon-mac"/></svg>
+            <div class="plabel">Meeting Notes App</div>
           </div>
           <div class="proj-cell" data-name="Fraud Detection" data-url="https://github.com/cstillick/fraud-detection" data-desc="Real-time credit card fraud detection ML pipeline — XGBoost classifier with a tuned decision threshold on 284,807 transactions, SHAP explainability surfacing the top feature drivers per prediction (FCRA/ECOA adverse-action compliance), served via a FastAPI inference endpoint.">
             <svg viewBox="0 0 32 32"><use href="#icon-doc"/></svg>
             <div class="plabel">Fraud Detection</div>
           </div>
+          <div class="proj-cell" data-name="Psychohistory Sim" data-url="https://github.com/cstillick/psychohistory-sim" data-desc="A fiscal-policy impact terminal pairing PolicyEngine microsimulation with regional input-output models to trace how tax and spending changes ripple through households and industries. Inspired by Asimov's Foundation.">
+            <svg viewBox="0 0 32 32"><use href="#icon-folder"/></svg>
+            <div class="plabel">Psychohistory Sim</div>
+          </div>
+          <div class="proj-cell" data-name="Stock Screener" data-url="https://github.com/cstillick/stock-screener" data-desc="Full-stack S&amp;P 500 stock screener — FastAPI backend with vectorized pandas indicators (SMA/EMA/RSI/MACD/Bollinger/ATR), composable named signals like golden_cross and bb_squeeze, concurrent yFinance fetching with parquet caching, and a single-page HTML/JS frontend. No database required.">
+            <svg viewBox="0 0 32 32"><use href="#icon-folder"/></svg>
+            <div class="plabel">Stock Screener</div>
+          </div>
+          <div class="proj-cell" data-name="Crypto Arbitrage" data-url="https://github.com/cstillick/crypto-arbitrage" data-desc="Real-time cross-exchange arbitrage detector streaming Binance and Coinbase best bid/ask via WebSocket into an asyncio-safe price store, computing fee-adjusted spreads every 0.5s and surfacing opportunities in a live Rich terminal UI.">
+            <svg viewBox="0 0 32 32"><use href="#icon-doc"/></svg>
+            <div class="plabel">Crypto Arbitrage</div>
+          </div>
+          <div class="proj-cell" data-name="Backtesting Engine" data-url="https://github.com/cstillick/backtesting-engine" data-desc="From-scratch Python backtesting engine for algorithmic trading strategies — pluggable strategy interface, bar-by-bar event loop, slippage and commission simulation, and a performance tearsheet (CAGR, Sharpe, Sortino, max drawdown).">
+            <svg viewBox="0 0 32 32"><use href="#icon-folder"/></svg>
+            <div class="plabel">Backtesting Engine</div>
+          </div>
+          <div class="proj-cell" data-name="Order Book Engine" data-url="https://github.com/cstillick/order-book-engine" data-desc="A limit order book matching engine with strict price-time priority — limit and market orders, partial fills across multiple price levels, and order cancellation, emitting a trade tape as orders cross. The core that sits at the heart of every exchange.">
+            <svg viewBox="0 0 32 32"><use href="#icon-folder"/></svg>
+            <div class="plabel">Order Book Engine</div>
+          </div>
+          <div class="proj-cell" data-name="Regex Engine" data-url="https://github.com/cstillick/regex-engine" data-desc="A regular-expression engine built from scratch — parses a pattern into postfix, compiles it to an NFA via Thompson construction, then simulates the automaton over the input. Supports literals, ., *, +, ?, alternation, and grouping. No re module.">
+            <svg viewBox="0 0 32 32"><use href="#icon-doc"/></svg>
+            <div class="plabel">Regex Engine</div>
+          </div>
+          <div class="proj-cell" data-name="Spreadsheet Engine" data-url="https://github.com/cstillick/spreadsheet-engine" data-desc="A spreadsheet calculation engine — cells hold literals or =formulas referencing other cells and ranges (=SUM(A1:A3)). Builds a dependency graph, topologically sorts it, detects circular references, and recomputes in correct order on every change.">
+            <svg viewBox="0 0 32 32"><use href="#icon-folder"/></svg>
+            <div class="plabel">Spreadsheet Engine</div>
+          </div>
+          <div class="proj-cell" data-name="Physics Engine" data-url="https://github.com/cstillick/physics-engine" data-desc="A 2D physics engine using Verlet integration — particles fall under gravity, bounce off world bounds with configurable restitution and friction, and are linked by distance constraints solved through iterative relaxation. Add a renderer to watch cloth and ragdolls.">
+            <svg viewBox="0 0 32 32"><use href="#icon-folder"/></svg>
+            <div class="plabel">Physics Engine</div>
+          </div>
+          <div class="proj-cell" data-name="CHIP-8 Emulator" data-url="https://github.com/cstillick/chip8-emulator" data-desc="A CHIP-8 virtual machine — 4KB memory, 16 registers, a 64×32 monochrome framebuffer, the built-in font set, and the core opcode set (jumps, subroutines, ALU ops, sprite drawing with collision, BCD). The headless CPU unit-tests cleanly; drop in a pygame front-end and a ROM to play.">
+            <svg viewBox="0 0 32 32"><use href="#icon-doc"/></svg>
+            <div class="plabel">CHIP-8 Emulator</div>
+          </div>
           <div class="proj-cell" data-name="DNS Resolver" data-url="https://github.com/cstillick/dns-resolver" data-desc="DNS resolver built from scratch on raw UDP sockets — no dnspython. Manually parses and serializes RFC 1035 wire format (including pointer compression and glue records) and resolves names iteratively from the root nameservers, following CNAME chains. Supports A, AAAA, MX, CNAME, TXT, and NS records.">
             <svg viewBox="0 0 32 32"><use href="#icon-doc"/></svg>
             <div class="plabel">DNS Resolver</div>
+          </div>
+          <div class="proj-cell" data-name="Payment Ledger" data-url="https://github.com/cstillick/payment-ledger" data-desc="An immutable double-entry accounting ledger — every transaction is a set of debit/credit lines that must net to zero, balances update atomically, and the journal is append-only and SHA-256 hash-chained so any tampering is detectable. Includes trial-balance and chain verification.">
+            <svg viewBox="0 0 32 32"><use href="#icon-doc"/></svg>
+            <div class="plabel">Payment Ledger</div>
+          </div>
+          <div class="proj-cell" data-name="Options Pricer" data-url="https://github.com/cstillick/options-pricer" data-desc="European option pricing via closed-form Black-Scholes-Merton (with dividend yield) and Monte Carlo simulation under geometric Brownian motion, plus the full Greeks (delta, gamma, vega, theta, rho). Tests verify put-call parity, a textbook value, and Monte Carlo convergence to the analytic price.">
+            <svg viewBox="0 0 32 32"><use href="#icon-doc"/></svg>
+            <div class="plabel">Options Pricer</div>
+          </div>
+          <div class="proj-cell" data-name="VaR Calculator" data-url="https://github.com/cstillick/var-calculator" data-desc="Computes Value-at-Risk and Expected Shortfall three ways — historical simulation, the parametric variance-covariance method, and Monte Carlo — reporting VaR as both a return percentage and a dollar figure. Tests confirm the methods agree for normal returns and that ES is always at least as severe as VaR.">
+            <svg viewBox="0 0 32 32"><use href="#icon-doc"/></svg>
+            <div class="plabel">VaR Calculator</div>
+          </div>
+          <div class="proj-cell" data-name="Portfolio Optimizer" data-url="https://github.com/cstillick/portfolio-optimizer" data-desc="Markowitz mean-variance portfolio optimization in pure Python — estimates the covariance matrix from return series, finds the long-only maximum-Sharpe portfolio, and traces the efficient frontier. Demonstrates how diversification lowers portfolio volatility.">
+            <svg viewBox="0 0 32 32"><use href="#icon-doc"/></svg>
+            <div class="plabel">Portfolio Optimizer</div>
+          </div>
+          <div class="proj-cell" data-name="Yield Curve Bootstrapper" data-url="https://github.com/cstillick/yield-curve-bootstrapper" data-desc="Bootstraps a zero-coupon discount curve from par bond and swap rates, converts discount factors to zero rates, prices fixed-rate bonds off the curve, and solves yield-to-maturity by bisection. Tests confirm a par bond prices to face value on its own curve.">
+            <svg viewBox="0 0 32 32"><use href="#icon-doc"/></svg>
+            <div class="plabel">Yield Curve Bootstrapper</div>
+          </div>
+          <div class="proj-cell" data-name="DCF Valuation" data-url="https://github.com/cstillick/dcf-valuation" data-desc="A discounted cash flow valuation engine — projects free cash flows from a base year and growth path, discounts them at WACC, adds a Gordon-growth terminal value, subtracts net debt for equity value, and divides by shares for an implied price. Tests verify discounting monotonicity and the WACC &gt; terminal-growth guard.">
+            <svg viewBox="0 0 32 32"><use href="#icon-doc"/></svg>
+            <div class="plabel">DCF Valuation</div>
+          </div>
+          <div class="proj-cell" data-name="Credit Scoring" data-url="https://github.com/cstillick/credit-scoring" data-desc="A credit-default model — logistic regression trained from scratch with batch gradient descent and feature standardization (no sklearn), plus a banking-style scorecard mapping default probability to a points score (configurable base, PDO, base odds). Reports AUC; tests confirm the score is monotonic in risk.">
+            <svg viewBox="0 0 32 32"><use href="#icon-doc"/></svg>
+            <div class="plabel">Credit Scoring</div>
+          </div>
+          <div class="proj-cell" data-name="JSON Parser" data-url="https://github.com/cstillick/json-parser" data-desc="A JSON parser, validator, and pretty-printer written from scratch with recursive descent — no json module. Handles objects, arrays, strings with escapes, numbers (int/float/exponent), booleans, and null, with positional error messages. Includes a dumps pretty-printer.">
+            <svg viewBox="0 0 32 32"><use href="#icon-doc"/></svg>
+            <div class="plabel">JSON Parser</div>
+          </div>
+          <div class="proj-cell" data-name="Markdown Parser" data-url="https://github.com/cstillick/markdown-parser" data-desc="A Markdown-to-HTML renderer built from scratch — headings, bold/italic/inline-code, links, ordered and unordered lists, blockquotes, fenced code blocks, and paragraphs. HTML output is escaped for safety.">
+            <svg viewBox="0 0 32 32"><use href="#icon-doc"/></svg>
+            <div class="plabel">Markdown Parser</div>
+          </div>
+          <div class="proj-cell" data-name="Maze Pathfinder" data-url="https://github.com/cstillick/maze-pathfinder" data-desc="Generates perfect mazes with randomized Prim's algorithm and solves them with BFS, Dijkstra, and A* (Manhattan heuristic), rendering maze and solution path as ASCII art. Tests verify the found path is connected and optimal.">
+            <svg viewBox="0 0 32 32"><use href="#icon-doc"/></svg>
+            <div class="plabel">Maze Pathfinder</div>
+          </div>
+          <div class="proj-cell" data-name="Sudoku Solver" data-url="https://github.com/cstillick/sudoku-solver" data-desc="Solves any 9×9 Sudoku using constraint propagation (minimum-remaining-value heuristic) combined with backtracking search, and generates new puzzles with a configurable number of clues. Solves hard boards in milliseconds.">
+            <svg viewBox="0 0 32 32"><use href="#icon-doc"/></svg>
+            <div class="plabel">Sudoku Solver</div>
+          </div>
+          <div class="proj-cell" data-name="Wordle Solver" data-url="https://github.com/cstillick/wordle-solver" data-desc="An information-theory Wordle solver — for each guess it computes the expected information gain (Shannon entropy over the feedback-pattern distribution) and picks the guess that eliminates the most candidates on average. Solves the demo dictionary within six turns every time.">
+            <svg viewBox="0 0 32 32"><use href="#icon-doc"/></svg>
+            <div class="plabel">Wordle Solver</div>
+          </div>
+          <div class="proj-cell" data-name="Tax Lot Tracker" data-url="https://github.com/cstillick/tax-lot-tracker" data-desc="Tracks share lots and computes realized capital gains on sale with selectable cost-basis methods (FIFO, LIFO, HIFO), automatic short- vs long-term classification on a 365-day holding period, and per-method gain summaries. Tests confirm HIFO minimizes realized gains versus FIFO.">
+            <svg viewBox="0 0 32 32"><use href="#icon-doc"/></svg>
+            <div class="plabel">Tax Lot Tracker</div>
+          </div>
+          <div class="proj-cell" data-name="Invoice Reconciler" data-url="https://github.com/cstillick/invoice-reconciler" data-desc="Matches incoming bank payments to outstanding invoices in two passes — exact matches on amount and normalized reference, then fuzzy matches on amount plus reference string similarity (difflib ratio) — flagging whatever is left unreconciled. The grunt work of accounts-receivable, automated.">
+            <svg viewBox="0 0 32 32"><use href="#icon-doc"/></svg>
+            <div class="plabel">Invoice Reconciler</div>
+          </div>
+          <div class="proj-cell" data-name="Brainfuck Interpreter" data-url="https://github.com/cstillick/bf-interpreter" data-desc="A Brainfuck interpreter with a compile pass that run-length-encodes runs of identical +, -, &lt;, and &gt; instructions, precomputes matching bracket targets for O(1) jumps, and collapses [-] clear loops into a single op. Runs the classic Hello World correctly.">
+            <svg viewBox="0 0 32 32"><use href="#icon-doc"/></svg>
+            <div class="plabel">Brainfuck Interpreter</div>
           </div>
         </div>
         <div class="proj-detail">
@@ -1785,11 +1873,12 @@ menus.forEach(function(menu){
     e.stopPropagation();
     var was = menu.classList.contains('openm');
     closeMenus();
-    if (!was) menu.classList.add('openm');
+    if (!was){ updateEditMenu(); menu.classList.add('openm'); }
   });
   t.addEventListener('mouseenter', function(){
     if (menus.some(function(m){ return m.classList.contains('openm'); })){
       closeMenus();
+      updateEditMenu();
       menu.classList.add('openm');
     }
   });
@@ -2266,8 +2355,82 @@ document.addEventListener('mouseover', function(e){
   balloon.style.top = y + 'px';
 });
 
+/* ---------- Edit menu: Undo/Cut/Paste/Clear act on SimpleText documents ----------
+   Live only while a .txt-edit window is frontmost; #menubar's mousedown
+   preventDefault keeps the document's selection alive through the menu click. */
+function frontTxtEditor(){
+  var id = activeId();
+  if (!id || id.indexOf('txt') !== 0 || !wins[id]) return null;
+  return wins[id].el.querySelector('.txt-edit');
+}
+function editorSelection(){
+  var ed = frontTxtEditor();
+  if (!ed) return null;
+  var sel = window.getSelection();
+  if (!sel.rangeCount || sel.isCollapsed) return null;
+  if (!ed.contains(sel.anchorNode) || !ed.contains(sel.focusNode)) return null;
+  return { ed: ed, sel: sel };
+}
+function editorSaved(ed){ ed.dispatchEvent(new Event('input')); }
+function updateEditMenu(){
+  var ed = frontTxtEditor();
+  var s = editorSelection();
+  document.getElementById('mi-undo').classList.toggle('disabled', !ed);
+  document.getElementById('mi-cut').classList.toggle('disabled', !s);
+  document.getElementById('mi-paste').classList.toggle('disabled',
+    !(ed && navigator.clipboard && navigator.clipboard.readText));
+  document.getElementById('mi-clear').classList.toggle('disabled', !s);
+}
+
 var actions = {
   about: function(){ openWin('about'); },
+  undo: function(){
+    var ed = frontTxtEditor();
+    if (!ed) return;
+    ed.focus();
+    document.execCommand('undo');
+    editorSaved(ed);
+  },
+  cut: function(){
+    var s = editorSelection();
+    if (!s) return;
+    var text = String(s.sel);
+    if (text && navigator.clipboard) navigator.clipboard.writeText(text).catch(function(){});
+    s.sel.deleteFromDocument();
+    editorSaved(s.ed);
+  },
+  paste: function(){
+    var ed = frontTxtEditor();
+    if (!ed || !navigator.clipboard || !navigator.clipboard.readText) return;
+    navigator.clipboard.readText().then(function(text){
+      if (!text) return;
+      ed.focus();
+      var sel = window.getSelection();
+      var rng;
+      if (sel.rangeCount && ed.contains(sel.anchorNode) && ed.contains(sel.focusNode)){
+        rng = sel.getRangeAt(0);
+        rng.deleteContents();
+      } else {
+        /* no caret in the document: paste at the end */
+        rng = document.createRange();
+        rng.selectNodeContents(ed);
+        rng.collapse(false);
+      }
+      var node = document.createTextNode(text);
+      rng.insertNode(node);
+      rng.setStartAfter(node);
+      rng.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(rng);
+      editorSaved(ed);
+    }).catch(function(){});
+  },
+  clear: function(){
+    var s = editorSelection();
+    if (!s) return;
+    s.sel.deleteFromDocument();
+    editorSaved(s.ed);
+  },
   close: function(){ var id = activeId(); if (id) closeWin(id); },
   cleanup: function(){ placeDefaults(); layoutIcons(); },
   restart: function(){ window.location.reload(); },
@@ -2294,10 +2457,11 @@ var actions = {
   },
   selectall: function(){
     var id = activeId();
-    if (id === 'resume'){
+    var doc = id === 'resume' ? wins.resume.el.querySelector('.resume-text') : frontTxtEditor();
+    if (doc){
       /* SimpleText is frontmost: select the document text */
       var rng = document.createRange();
-      rng.selectNodeContents(wins.resume.el.querySelector('.resume-text'));
+      rng.selectNodeContents(doc);
       var s = window.getSelection();
       s.removeAllRanges();
       s.addRange(rng);
